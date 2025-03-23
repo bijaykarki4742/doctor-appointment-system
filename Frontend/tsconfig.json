@@ -10,6 +10,11 @@
   ],
   "compilerOptions": {
     "baseUrl": ".",
+    "allowJs": true,
+    "checkJs": false,
+    "isolatedModules": true,
+    "noEmit": true,
+    "jsx": "react-jsx",
     "paths": {
       "@/*": ["./src/*"]
     }
