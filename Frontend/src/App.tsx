@@ -1,14 +1,14 @@
-import './App.css'
-import { Button } from './components/ui/button'
+import { Route, Routes } from 'react-router-dom'
+import Home from "./pages/Home";
+import About from './pages/About';
 
 function App() {
 
   return (
-    <>
-      <div className="flex flex-col items-center justify-center min-h-svh">
-        <Button>Click this part of me</Button>
-      </div>
-    </>
+    <Routes>
+      <Route path="/" element={<Home />} />
+      <Route path="/about" element={<About />} />
+    </Routes>
   )
 }
 
