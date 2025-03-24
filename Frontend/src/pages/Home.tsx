@@ -1,5 +1,5 @@
 import EasyCare from '@/containers/EasyCare'
-import React from 'react'
+
 
 const Home = () => {
     return (
