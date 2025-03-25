@@ -1,12 +1,20 @@
 import express from 'express';
 import connectDB from './config/database.js';
-import userRoutes from './routes/userRoute.js';
+import bodyParser from 'body-parser';
+import router from './routes/authRoutes.js';
+import cors from 'cors';
+import dotenv from 'dotenv';
+
+
 
 const app = express();
 const PORT = process.env.PORT || 3000;
 
+dotenv.config();
+
 // Middleware
 app.use(express.json());
+app.use(bodyParser.json());
 
 // Error handling middleware
 app.use((err, req, res, next) => {
@@ -14,8 +22,14 @@ app.use((err, req, res, next) => {
     res.status(500).json({ message: 'Something went wrong!' });
 });
 
+app.use(cors({
+    origin: 'http://localhost:5173', // Replace with your frontend URL
+    methods: ['GET', 'POST', 'PUT', 'DELETE'],
+    allowedHeaders: ['Content-Type'],
+}))
+
 // Routes
-app.use('/api/users', userRoutes);
+app.use('/', router);
 
 
 // Connect to database
@@ -29,3 +43,4 @@ connectDB().
         console.log("Connection failed");
     })
 
+export default app;
