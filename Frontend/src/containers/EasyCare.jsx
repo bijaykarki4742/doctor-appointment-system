@@ -1,31 +1,20 @@
 import { useNavigate } from "react-router-dom";
+import Navbar from "./Navbar";
+import { Card, CardDescription, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import { useState } from "react";
+import { CarouselSize } from "./Cont";
 
 const EasyCare = () => {
 
     const navigate = useNavigate();
 
+    const [date, setDate] = useState(new Date());
+    const [isEditable,setIsEditable] = useState(false);
+
     return (
         <div className="min-h-screen bg-white">
             {/* Navigation Bar */}
-            <nav className="flex items-center justify-between px-6 py-4 border-b">
-                <div className="flex items-center">
-                    <div className="w-32 h-10 bg-gray-300">
-                        <h1>EasyCare</h1>
-                    </div>
-                </div>
-                <div className="flex space-x-6">
-                    <a href="#" className="text-sm font-medium text-gray-800">Home</a>
-                    <a href="#" className="text-sm font-medium text-gray-800">Find Doctors</a>
-                    <a href="#" className="text-sm font-medium text-gray-800">Services</a>
-                    <a href="#" className="text-sm font-medium text-gray-800">Contact Us</a>
-                    <a href="#" className="text-sm font-medium text-gray-800">About Us</a>
-                </div>
-                <div className="">
-                    <button className="px-4 py-2 bg-teal-500 text-white rounded-md m-2" onClick={() => navigate("/login")}>Login</button>
-                    <button className="px-4 py-2 bg-teal-500 text-white rounded-md" onClick={() => navigate("/signup")}>Sign Up</button>
-                </div>
-            </nav>
-
+            <Navbar></Navbar>
             {/* Main Content */}
             <div className="max-w-6xl mx-auto px-4 py-12">
                 <div className="flex flex-col md:flex-row items-center justify-between">
@@ -44,22 +33,6 @@ const EasyCare = () => {
                             <button className="absolute right-0 px-4 py-2 bg-teal-500 text-white rounded-r-md">
                                 Search
                             </button>
-                        </div>
-
-                        {/* Doctor Finder Buttons */}
-                        <div className="flex space-x-4">
-                            <div className="flex-1 flex flex-col items-center p-4 border-t-4 border-green-500 rounded shadow">
-                                <div className="text-green-500 mb-2">🔍</div>
-                                <p className="text-sm text-center">Find A Doctor</p>
-                            </div>
-                            <div className="flex-1 flex flex-col items-center p-4 border-t-4 border-blue-500 rounded shadow">
-                                <div className="text-blue-500 mb-2">🔍</div>
-                                <p className="text-sm text-center">Find A Doctor</p>
-                            </div>
-                            <div className="flex-1 flex flex-col items-center p-4 border-t-4 border-teal-500 rounded shadow">
-                                <div className="text-teal-500 mb-2">🔍</div>
-                                <p className="text-sm text-center">Find A Doctor</p>
-                            </div>
                         </div>
                     </div>
 
@@ -120,6 +93,7 @@ const EasyCare = () => {
                     </div>
                 </div>
             </div>
+            <CarouselSize></CarouselSize>
         </div>
     );
 };
