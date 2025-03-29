@@ -14,13 +14,14 @@ const navLinks = [
 export default function Navbar() {
 
   const [menuOpen, setMenuOpen] = useState(false);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
 
   return (
     <nav className="bg-white shadow-md fixed w-full z-10 top-0 left-0">
       <div className="container mx-auto px-4 py-3 flex justify-between items-center">
         {/* Logo */}
         <Link to="/" className="text-xl font-bold">
-          MyBrand
+          Easy Care
         </Link>
 
         {/* Desktop Menu */}
@@ -34,6 +35,20 @@ export default function Navbar() {
               {link.name}
             </Link>
           ))}
+          <div className="flex items-center space-x-2">
+            {isLoggedIn ? (
+              <Button onClick={handleAuthAction}>Logout</Button>
+            ) : (
+              <>
+                <Button variant="outline" asChild>
+                  <Link to="/login">Login</Link>
+                </Button>
+                <Button asChild>
+                  <Link to="/signup">Sign Up</Link>
+                </Button>
+              </>
+            )}
+          </div>
         </div>
 
         {/* Mobile Menu Button */}

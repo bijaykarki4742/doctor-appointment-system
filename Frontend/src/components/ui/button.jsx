@@ -9,17 +9,12 @@ const buttonVariants = cva(
   {
     variants: {
       variant: {
-        default:
-          "bg-primary text-primary-foreground shadow-xs hover:bg-primary/90",
-        destructive:
-          "bg-destructive text-white shadow-xs hover:bg-destructive/90 focus-visible:ring-destructive/20 dark:focus-visible:ring-destructive/40 dark:bg-destructive/60",
-        outline:
-          "border bg-background shadow-xs hover:bg-accent hover:text-accent-foreground dark:bg-input/30 dark:border-input dark:hover:bg-input/50",
-        secondary:
-          "bg-secondary text-secondary-foreground shadow-xs hover:bg-secondary/80",
-        ghost:
-          "hover:bg-accent hover:text-accent-foreground dark:hover:bg-accent/50",
-        link: "text-primary underline-offset-4 hover:underline",
+        default: "bg-teal-500 text-white shadow-xs hover:bg-teal-600 focus-visible:ring-teal-300",
+        destructive: "bg-red-500 text-white shadow-xs hover:bg-red-600 focus-visible:ring-red-300",
+        outline: "border border-teal-500 bg-transparent text-teal-500 shadow-xs hover:bg-teal-50 dark:border-teal-400 dark:text-teal-400 dark:hover:bg-teal-900/30",
+        secondary: "bg-gray-100 text-gray-800 shadow-xs hover:bg-gray-200 dark:bg-gray-800 dark:text-gray-200 dark:hover:bg-gray-700",
+        ghost: "text-teal-500 hover:bg-teal-50 dark:text-teal-400 dark:hover:bg-teal-900/30",
+        link: "text-teal-500 underline-offset-4 hover:underline dark:text-teal-400",
       },
       size: {
         default: "h-9 px-4 py-2 has-[>svg]:px-3",

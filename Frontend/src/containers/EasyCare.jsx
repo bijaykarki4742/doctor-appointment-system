@@ -2,14 +2,11 @@ import { useNavigate } from "react-router-dom";
 import Navbar from "./Navbar";
 import { Card, CardDescription, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { useState } from "react";
-import { CarouselSize } from "./Cont";
+import { Button } from "@/components/ui/button";
 
 const EasyCare = () => {
 
     const navigate = useNavigate();
-
-    const [date, setDate] = useState(new Date());
-    const [isEditable,setIsEditable] = useState(false);
 
     return (
         <div className="min-h-screen bg-white">
@@ -30,9 +27,7 @@ const EasyCare = () => {
                                 placeholder="Search Doctor, Hospital, Clinic, Labs, Medicines ..."
                                 className="w-full py-3 px-4 bg-gray-100 rounded-md"
                             />
-                            <button className="absolute right-0 px-4 py-2 bg-teal-500 text-white rounded-r-md">
-                                Search
-                            </button>
+                            <Button>Search</Button>
                         </div>
                     </div>
 
@@ -93,7 +88,6 @@ const EasyCare = () => {
                     </div>
                 </div>
             </div>
-            <CarouselSize></CarouselSize>
         </div>
     );
 };

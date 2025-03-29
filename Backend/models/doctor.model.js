@@ -19,7 +19,7 @@ const DoctorSchema = new mongoose.Schema({
     contact: {
         type: String,
         required: true,
-        unique:[true,"Contact number should be unique"],
+        unique: [true, "Contact number should be unique"],
         validate: {
             validator: function (v) {
                 return /\d{10,15}/.test(v);
@@ -31,39 +31,36 @@ const DoctorSchema = new mongoose.Schema({
     specialization: {
         type: String,
         required: true,
-        enum: ["None","Cardiology", "Dermatology", "Pediatrics", "Neurology", "Orthopedics", "Gastroenterology", "Ophthalmology", "Psychiatry",],
-        default:"None"
+        enum: ["None", "Cardiology", "Dermatology", "Pediatrics", "Neurology", "Orthopedics", "Gastroenterology", "Ophthalmology", "Psychiatry",],
+        default: "None"
     },
-    qualifications: [{
-        degree: String,
-        university: String,
-        year: Number
-    }],
     licenseNumber: {
         type: String,
         required: true,
-        unique: [true,"licenseNumber should be unique"],
+        unique: [true, "licenseNumber should be unique"],
         validate: {
             validator: v => /^\d{4,8}$/.test(v),
             message: "Invalid license number format"
         },
-        default:"0000"
+        default: "0000"
     },
-    hospitalAffiliation: [{
-        name: String,
-        address: String,
-        position: String
-    }],
+    gender: {
+        type: String,
+        enum: ['male', 'female', 'other'],
+        required: [true, "Gender is required"]
+    },
+    qualifications: [String], // Accepts array of strings
+    hospitalAffiliation: [String], // Accepts array of strings
     experience: {
         type: Number,
         required: true,
-        default:0
+        default: 0
     },
     bio: String,
     languagesSpoken: [String],
     consultationFee: {
         type: Number,
-        default:0
+        default: 0
     },
     profilePicture: String,
     isVerified: {

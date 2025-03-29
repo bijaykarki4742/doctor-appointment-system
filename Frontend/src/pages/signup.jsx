@@ -2,72 +2,106 @@ import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { Input } from '@/components/ui/input';
 import { useNavigate } from 'react-router-dom';
+import api from '../api/axios';
 
 const Signup = () => {
-    const { 
-        register, 
-        handleSubmit, 
-        watch, 
-        formState: { errors, isSubmitting } 
-    } = useForm({
-        defaultValues: {
-            role: 'Patient'
-        }
-    });
+    const {
+        register, handleSubmit, watch, formState: { errors, isSubmitting } } = useForm({
+            defaultValues: {
+                role: 'patient',
+                gender: 'male',
+                address: {
+                    street: '',
+                    city: '',
+                    state: '',
+                    postalCode: '',
+                    country: ''
+                },
+                insuranceInfo: {
+                    provider: '',
+                    policyNumber: ''
+                },
+                emergencyContact: {
+                    name: '',
+                    relationship: '',
+                    phone: ''
+                }
+            }
+        });
 
     const role = watch("role");
     const agreedToTerms = watch("terms", false);
     const [error, setError] = useState('');
     const navigate = useNavigate();
 
+
     const onSubmit = async (data) => {
-        setError(''); // Clear previous errors
-        
-        // Validate password match
+        setError('');
+
         if (data.password !== data.confirmPassword) {
             setError("Passwords don't match");
             return;
         }
 
-        // Prepare request data
         const requestData = {
-            name: data.name,
             email: data.email,
             password: data.password,
             role: data.role,
-            ...(data.role === 'Doctor' && {
-                contact: data.contact,
-                specialty: data.specialty,
-                license: data.license
+            firstName: data.firstName,
+            lastName: data.lastName,
+            contact: data.contact,
+            // Patient-specific
+            ...(data.role === 'patient' && {
+                dateOfBirth: new Date(data.dateOfBirth).toISOString(), // Convert to ISO string
+                gender: data.gender,
+                address: data.address,
+                insuranceInfo: data.insuranceInfo,
+                medicalHistory: typeof data.medicalHistory === 'string'
+                    ? data.medicalHistory.split(',').map(m => m.trim()).filter(Boolean)
+                    : data.medicalHistory || [],
+                allergies: typeof data.allergies === 'string'
+                    ? data.allergies.split(',').map(a => a.trim()).filter(Boolean)
+                    : data.allergies || [],
+                emergencyContact: data.emergencyContact,
+            }),
+            // Doctor-specific
+            ...(data.role === 'doctor' && {
+                specialization: data.specialization,
+                licenseNumber: data.licenseNumber,
+                experience: Number(data.experience) || 0, // Ensure number type
+                gender: data.gender || 'Male', // Add gender for doctors
+                qualifications: typeof data.qualifications === 'string'
+                    ? data.qualifications.split(',').map(q => q.trim()).filter(Boolean)
+                    : data.qualifications || [],
+                hospitalAffiliation: typeof data.hospitalAffiliation === 'string'
+                    ? data.hospitalAffiliation.split(',').map(h => h.trim()).filter(Boolean)
+                    : data.hospitalAffiliation || [],
+                bio: data.bio || "",
+                languagesSpoken: typeof data.languagesSpoken === 'string'
+                    ? data.languagesSpoken.split(',').map(l => l.trim()).filter(Boolean)
+                    : data.languagesSpoken || [],
             })
         };
 
         try {
-            const response = await fetch('http://localhost:3000/api/signup', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(requestData),
-                credentials: 'include' // If using cookies
-            });
+            const response = await api.post('/auth/signup', requestData);
 
-            const result = await response.json();
-
-            if (!response.ok) {
-                throw new Error(result.message || 'Signup failed');
+            if (response.data.success) {
+                navigate('/login');
+            } else {
+                throw new Error(response.data.error || 'Signup failed');
             }
-
-            console.log('Signup successful:', result);
-            navigate('/login');
         } catch (err) {
-            console.error('Signup error:', err);
-            setError(err.message || 'An error occurred during signup');
+            const errorMessage = err.response?.data?.error ||
+                err.message ||
+                'An error occurred during signup';
+            setError(errorMessage);
+            console.error('Signup error:', err.response?.data || err.message);
         }
     };
 
     return (
-        <form onSubmit={handleSubmit(onSubmit)} className="flex items-start w-full px-20 py-30 h-full bg-white">
+        <form onSubmit={handleSubmit(onSubmit)} className="flex items-start w-full px-20 py-12 h-full bg-white">
             <div className="flex flex-col w-1/2 items-start justify-start">
                 <div>
                     <h1 className="text-[44px] font-bold text-green-600">EasyCare</h1>
@@ -80,107 +114,130 @@ const Signup = () => {
                     </div>
                 )}
 
-                <div className="flex flex-col items-start mt-10 gap-4 w-full">
+                <div className="flex flex-col items-start mt-6 gap-4 w-full">
+                    {/* Common Fields */}
                     <div className="flex flex-col gap-2 w-full">
-                        <label htmlFor="name">Name</label>
-                        <Input 
-                            {...register("name", { 
-                                required: "Name is required",
-                                minLength: {
-                                    value: 2,
-                                    message: "Name must be at least 2 characters"
-                                }
-                            })} 
-                            id="name" 
-                            placeholder="Enter your name" 
-                        />
-                        {errors.name && <span className="text-red-500 text-sm">{errors.name.message}</span>}
+                        <label htmlFor="role">I am a</label>
+                        <select
+                            id="role"
+                            {...register("role")}
+                            className="border w-full rounded-lg p-2"
+                        >
+                            <option value="patient">Patient</option>
+                            <option value="doctor">Doctor</option>
+                        </select>
+                    </div>
+
+                    <div className="flex gap-4 w-full">
+                        <div className="flex flex-col gap-2 w-1/2">
+                            <label htmlFor="firstName">First Name</label>
+                            <Input
+                                {...register("firstName", {
+                                    required: "First name is required",
+                                    minLength: {
+                                        value: 2,
+                                        message: "Must be at least 2 characters"
+                                    }
+                                })}
+                                id="firstName"
+                                placeholder="First name"
+                            />
+                            {errors.firstName && <span className="text-red-500 text-sm">{errors.firstName.message}</span>}
+                        </div>
+
+                        <div className="flex flex-col gap-2 w-1/2">
+                            <label htmlFor="lastName">Last Name</label>
+                            <Input
+                                {...register("lastName", {
+                                    required: "Last name is required",
+                                    minLength: {
+                                        value: 2,
+                                        message: "Must be at least 2 characters"
+                                    }
+                                })}
+                                id="lastName"
+                                placeholder="Last name"
+                            />
+                            {errors.lastName && <span className="text-red-500 text-sm">{errors.lastName.message}</span>}
+                        </div>
                     </div>
 
                     <div className="flex flex-col gap-2 w-full">
                         <label htmlFor="email">Email Address</label>
-                        <Input 
-                            {...register("email", { 
+                        <Input
+                            {...register("email", {
                                 required: "Email is required",
                                 pattern: {
                                     value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
                                     message: "Invalid email address"
                                 }
-                            })} 
-                            id="email" 
-                            type="email" 
-                            placeholder="Enter your email" 
+                            })}
+                            id="email"
+                            type="email"
+                            placeholder="Enter your email"
                         />
                         {errors.email && <span className="text-red-500 text-sm">{errors.email.message}</span>}
                     </div>
 
                     <div className="flex flex-col gap-2 w-full">
-                        <label htmlFor="password">Password</label>
-                        <Input 
-                            {...register("password", { 
-                                required: "Password is required",
-                                minLength: {
-                                    value: 6,
-                                    message: "Password must be at least 6 characters"
+                        <label htmlFor="contact">Contact Number</label>
+                        <Input
+                            {...register("contact", {
+                                required: "Contact is required",
+                                pattern: {
+                                    value: /^[0-9]{10,15}$/,
+                                    message: "Invalid phone number"
                                 }
-                            })} 
-                            id="password" 
-                            type="password" 
-                            placeholder="Enter your password" 
+                            })}
+                            id="contact"
+                            type="tel"
+                            placeholder="Enter your contact number"
                         />
-                        {errors.password && <span className="text-red-500 text-sm">{errors.password.message}</span>}
+                        {errors.contact && <span className="text-red-500 text-sm">{errors.contact.message}</span>}
                     </div>
 
-                    <div className="flex flex-col gap-2 w-full">
-                        <label htmlFor="confirmPassword">Confirm Password</label>
-                        <Input 
-                            {...register("confirmPassword", { 
-                                required: "Please confirm your password"
-                            })} 
-                            id="confirmPassword" 
-                            type="password" 
-                            placeholder="Confirm your password" 
-                        />
+                    <div className="flex gap-4 w-full">
+                        <div className="flex flex-col gap-2 w-1/2">
+                            <label htmlFor="password">Password</label>
+                            <Input
+                                {...register("password", {
+                                    required: "Password is required",
+                                    minLength: {
+                                        value: 6,
+                                        message: "Must be at least 6 characters"
+                                    }
+                                })}
+                                id="password"
+                                type="password"
+                                placeholder="Enter password"
+                            />
+                            {errors.password && <span className="text-red-500 text-sm">{errors.password.message}</span>}
+                        </div>
+
+                        <div className="flex flex-col gap-2 w-1/2">
+                            <label htmlFor="confirmPassword">Confirm Password</label>
+                            <Input
+                                {...register("confirmPassword", {
+                                    required: "Please confirm your password"
+                                })}
+                                id="confirmPassword"
+                                type="password"
+                                placeholder="Confirm password"
+                            />
+                        </div>
                     </div>
 
-                    <div className="flex flex-col gap-2 w-full">
-                        <label htmlFor="role">Role</label>
-                        <select
-                            id="role"
-                            {...register("role")}
-                            className="border w-full bg-green-200 rounded-lg p-2"
-                        >
-                            <option value="Patient">Patient</option>
-                            <option value="Doctor">Doctor</option>
-                        </select>
-                    </div>
-
-                    {role === 'Doctor' && (
+                    {/* Role-Specific Fields */}
+                    {role === 'doctor' ? (
                         <>
                             <div className="flex flex-col gap-2 w-full">
-                                <label htmlFor="contact">Contact Number</label>
-                                <Input 
-                                    {...register("contact", { 
-                                        required: "Contact number is required",
-                                        pattern: {
-                                            value: /^[0-9]{10,15}$/,
-                                            message: "Invalid phone number"
-                                        }
-                                    })} 
-                                    id="contact" 
-                                    type="tel" 
-                                    placeholder="Enter your contact number" 
-                                />
-                                {errors.contact && <span className="text-red-500 text-sm">{errors.contact.message}</span>}
-                            </div>
-                            <div className="flex flex-col gap-2 w-full">
-                                <label htmlFor="specialty">Specialty</label>
-                                <select 
-                                    id="specialty" 
-                                    {...register("specialty", { 
-                                        required: "Specialty is required"
-                                    })} 
-                                    className="w-full bg-green-200 border rounded-lg p-2"
+                                <label htmlFor="specialization">Specialization</label>
+                                <select
+                                    id="specialization"
+                                    {...register("specialization", {
+                                        required: "Specialization is required"
+                                    })}
+                                    className="w-full border rounded-lg p-2"
                                 >
                                     <option value="">Select your specialty</option>
                                     <option value="Cardiology">Cardiology</option>
@@ -189,18 +246,169 @@ const Signup = () => {
                                     <option value="Neurology">Neurology</option>
                                     <option value="Orthopedics">Orthopedics</option>
                                 </select>
-                                {errors.specialty && <span className="text-red-500 text-sm">{errors.specialty.message}</span>}
+                                {errors.specialization && <span className="text-red-500 text-sm">{errors.specialization.message}</span>}
                             </div>
+
+                            <div className="flex gap-4 w-full">
+                                <div className="flex flex-col gap-2 w-1/2">
+                                    <label htmlFor="licenseNumber">License Number</label>
+                                    <Input
+                                        {...register("licenseNumber", {
+                                            required: "License number is required"
+                                        })}
+                                        id="licenseNumber"
+                                        placeholder="Medical license number"
+                                    />
+                                    {errors.licenseNumber && <span className="text-red-500 text-sm">{errors.licenseNumber.message}</span>}
+                                </div>
+
+                                <div className="flex flex-col gap-2 w-1/2">
+                                    <label htmlFor="experience">Years of Experience</label>
+                                    <Input
+                                        {...register("experience")}
+                                        id="experience"
+                                        type="number"
+                                        placeholder="Years"
+                                    />
+                                </div>
+                            </div>
+
                             <div className="flex flex-col gap-2 w-full">
-                                <label htmlFor="license">Medical License Number</label>
-                                <Input 
-                                    {...register("license", { 
-                                        required: "License number is required"
-                                    })} 
-                                    id="license" 
-                                    placeholder="Enter your medical license number" 
+                                <label htmlFor="qualifications">Qualifications (comma separated)</label>
+                                <Input
+                                    {...register("qualifications")}
+                                    id="qualifications"
+                                    placeholder="MD, MBBS, etc."
                                 />
-                                {errors.license && <span className="text-red-500 text-sm">{errors.license.message}</span>}
+                            </div>
+
+                            <div className="flex flex-col gap-2 w-full">
+                                <label htmlFor="hospitalAffiliation">Hospital Affiliations (comma separated)</label>
+                                <Input
+                                    {...register("hospitalAffiliation")}
+                                    id="hospitalAffiliation"
+                                    placeholder="Hospital names"
+                                />
+                            </div>
+
+                            <div className="flex flex-col gap-2 w-full">
+                                <label htmlFor="consultationFee">Consultation Fee (USD)</label>
+                                <Input
+                                    {...register("consultationFee")}
+                                    id="consultationFee"
+                                    type="number"
+                                    placeholder="Fee amount"
+                                />
+                            </div>
+                        </>
+                    ) : (
+                        <>
+                            <div className="flex gap-4 w-full">
+                                <div className="flex flex-col gap-2 w-1/2">
+                                    <label htmlFor="dateOfBirth">Date of Birth</label>
+                                    <Input
+                                        {...register("dateOfBirth", {
+                                            required: "Date of birth is required"
+                                        })}
+                                        id="dateOfBirth"
+                                        type="date"
+                                    />
+                                    {errors.dateOfBirth && <span className="text-red-500 text-sm">{errors.dateOfBirth.message}</span>}
+                                </div>
+
+                                <div className="flex flex-col gap-2 w-1/2">
+                                    <label htmlFor="gender">Gender</label>
+                                    <select
+                                        id="gender"
+                                        {...register("gender", { required: "Gender is required" })}
+                                        className="w-full border rounded-lg p-2"
+                                    >
+                                        <option value="male">Male</option>
+                                        <option value="female">Female</option>
+                                        <option value="other">Other</option>
+                                    </select>
+                                    {errors.gender && <span className="text-red-500 text-sm">{errors.gender.message}</span>}
+                                </div>
+                            </div>
+
+                            <div className="flex flex-col gap-2 w-full">
+                                <label>Address</label>
+                                <div className="grid grid-cols-2 gap-2">
+                                    <Input
+                                        {...register("address.street")}
+                                        placeholder="Street"
+                                    />
+                                    <Input
+                                        {...register("address.city")}
+                                        placeholder="City"
+                                    />
+                                    <Input
+                                        {...register("address.state")}
+                                        placeholder="State"
+                                    />
+                                    <Input
+                                        {...register("address.postalCode")}
+                                        placeholder="Postal Code"
+                                    />
+                                    <Input
+                                        {...register("address.country")}
+                                        placeholder="Country"
+                                        className="col-span-2"
+                                    />
+                                </div>
+                            </div>
+
+                            <div className="flex flex-col gap-2 w-full">
+                                <label>Insurance Information</label>
+                                <div className="flex gap-2">
+                                    <Input
+                                        {...register("insuranceInfo.provider")}
+                                        placeholder="Provider"
+                                        className="w-1/2"
+                                    />
+                                    <Input
+                                        {...register("insuranceInfo.policyNumber")}
+                                        placeholder="Policy Number"
+                                        className="w-1/2"
+                                    />
+                                </div>
+                            </div>
+
+                            <div className="flex flex-col gap-2 w-full">
+                                <label htmlFor="medicalHistory">Medical History (comma separated)</label>
+                                <Input
+                                    {...register("medicalHistory")}
+                                    id="medicalHistory"
+                                    placeholder="Conditions, surgeries, etc."
+                                />
+                            </div>
+
+                            <div className="flex flex-col gap-2 w-full">
+                                <label htmlFor="allergies">Allergies (comma separated)</label>
+                                <Input
+                                    {...register("allergies")}
+                                    id="allergies"
+                                    placeholder="List of allergies"
+                                />
+                            </div>
+
+                            <div className="flex flex-col gap-2 w-full">
+                                <label>Emergency Contact</label>
+                                <div className="grid grid-cols-2 gap-2">
+                                    <Input
+                                        {...register("emergencyContact.name")}
+                                        placeholder="Name"
+                                    />
+                                    <Input
+                                        {...register("emergencyContact.relationship")}
+                                        placeholder="Relationship"
+                                    />
+                                    <Input
+                                        {...register("emergencyContact.phone")}
+                                        placeholder="Phone"
+                                        className="col-span-2"
+                                    />
+                                </div>
                             </div>
                         </>
                     )}
@@ -220,11 +428,10 @@ const Signup = () => {
                     <button
                         type="submit"
                         disabled={!agreedToTerms || isSubmitting}
-                        className={`mt-6 px-4 py-2 rounded-lg text-white w-full ${
-                            !agreedToTerms || isSubmitting 
-                                ? 'bg-gray-400 cursor-not-allowed' 
-                                : 'bg-green-600 hover:bg-green-700'
-                        }`}
+                        className={`mt-6 px-4 py-2 rounded-lg text-white w-full ${!agreedToTerms || isSubmitting
+                            ? 'bg-gray-400 cursor-not-allowed'
+                            : 'bg-green-600 hover:bg-green-700'
+                            }`}
                     >
                         {isSubmitting ? 'Creating Account...' : 'Create Account'}
                     </button>
@@ -232,7 +439,7 @@ const Signup = () => {
             </div>
 
             <div className="flex justify-center w-1/2 items-center">
-                <img src="/Doctor.png" alt="Signup Illustration" className="max-w-full h-auto" />
+                <img src="/docimg.png" alt="Signup Illustration" className="max-w-full h-auto" />
             </div>
         </form>
     );
