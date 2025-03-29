@@ -4,14 +4,14 @@ import { Button } from "@/components/ui/button";
 import { useForm } from 'react-hook-form';
 import { useNavigate } from 'react-router-dom';
 import api from '../api/axios';
+import { useAuth } from '@/Contexts/AuthContext';
 
 const Login = () => {
     // Setup react-hook-form
     const { register, handleSubmit, formState: { errors } } = useForm();
     const navigate = useNavigate();
+    const {login} = useAuth(); 
 
-
-    const [isLoggedIn, setIsLoggedIn] = useState(false);
     const [error, setError] = useState('');
 
     // Function to handle form submission
@@ -19,7 +19,7 @@ const Login = () => {
 
         console.log('Form Data:', data);
         setError('');
-        
+
         // Prepare data for login API call
         const loginData = {
             email: data.email,
@@ -30,15 +30,13 @@ const Login = () => {
             const response = await api.post('/auth/login', loginData);
 
             if (response.data.success) {
-                // Store token if available
-                if (response.data.token) {
-                    localStorage.setItem('token', response.data.token);
-                }
-                
-                // Update auth state and redirect
-                setIsLoggedIn(true);
-                navigate('/'); // Or to dashboard: navigate('/dashboard');
-            } else {
+                login(response.data.token, {
+                  name: response.data.user.name, // Make sure backend returns name
+                  email: response.data.user.email
+                });
+                navigate('/');
+              }
+            else {
                 throw new Error(response.data.error || 'Login failed');
             }
         } catch (err) {

@@ -15,7 +15,7 @@ export const signup = async (req, res) => {
         }
 
         const user = await User.create({ email, password, role });
-        
+
         //Create role-specific profile
         if (role === "doctor") {
             // Process doctor-specific data
@@ -127,7 +127,7 @@ export const login = async (req, res) => {
             { expiresIn: '1d' }
         );
 
-        res.json({ success: true, token, user: { email: user.email, role: user.role } });
+        res.json({ success: true, token, user: { email: user.email, role: user.role, } });
     } catch (error) {
         console.error('Login error:', error);
         res.status(500).json({

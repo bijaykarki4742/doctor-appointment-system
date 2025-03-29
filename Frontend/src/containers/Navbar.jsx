@@ -1,7 +1,8 @@
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Menu, X } from "lucide-react";
+import { useAuth } from "@/Contexts/AuthContext";
 
 // Define your navigation links
 const navLinks = [
@@ -14,7 +15,13 @@ const navLinks = [
 export default function Navbar() {
 
   const [menuOpen, setMenuOpen] = useState(false);
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const { token, user, logout } = useAuth();
+  const navigate = useNavigate();
+
+  const handleLogout = () => {
+    logout();
+    navigate('/');
+  };
 
   return (
     <nav className="bg-white shadow-md fixed w-full z-10 top-0 left-0">
@@ -35,9 +42,14 @@ export default function Navbar() {
               {link.name}
             </Link>
           ))}
+
+
           <div className="flex items-center space-x-2">
-            {isLoggedIn ? (
-              <Button onClick={handleAuthAction}>Logout</Button>
+            {token ? (
+              <>
+                <span className="text-gray-700">Welcome, {user?.name || user?.email}</span>
+                <Button onClick={handleLogout}>Logout</Button>
+              </>
             ) : (
               <>
                 <Button variant="outline" asChild>
@@ -74,6 +86,51 @@ export default function Navbar() {
               {link.name}
             </Link>
           ))}
+
+          <div className="px-4 py-2">
+            {token ? (
+              <>
+                <div className="text-gray-700 py-2">
+                  Welcome, {user?.name || user?.email}
+                </div>
+                <Button
+                  className="w-full"
+                  onClick={() => {
+                    handleLogout();
+                    setMenuOpen(false);
+                  }}
+                >
+                  Logout
+                </Button>
+              </>
+            ) : (
+              <>
+                <Button
+                  variant="outline"
+                  className="w-full mb-2"
+                  asChild
+                >
+                  <Link
+                    to="/login"
+                    onClick={() => setMenuOpen(false)}
+                  >
+                    Login
+                  </Link>
+                </Button>
+                <Button
+                  className="w-full"
+                  asChild
+                >
+                  <Link
+                    to="/signup"
+                    onClick={() => setMenuOpen(false)}
+                  >
+                    Sign Up
+                  </Link>
+                </Button>
+              </>
+            )}
+          </div>
         </div>
       )}
     </nav>

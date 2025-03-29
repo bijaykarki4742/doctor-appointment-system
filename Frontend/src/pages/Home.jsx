@@ -1,14 +1,15 @@
 import EasyCare from '@/containers/EasyCare'
-
+import { useAuth } from '@/Contexts/AuthContext';
 
 const Home = () => {
     return (
         <>
             <section>
-                <EasyCare></EasyCare>
+                <EasyCare />
             </section>
         </>
-    )
-}
+    );
+};
+
 
 export default Home

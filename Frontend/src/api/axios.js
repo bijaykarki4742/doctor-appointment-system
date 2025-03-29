@@ -3,7 +3,6 @@ import axios from 'axios';
 // Create an Axios instance with default config
 const api = axios.create({
   baseURL: '/api', // Proxy will prepend this with "http://localhost:3000"
-  withCredentials: true, // Enable cookies/auth (if needed)
   headers: {
     'Content-Type': 'application/json',
   },
@@ -24,8 +23,29 @@ api.interceptors.request.use(
 
 api.interceptors.response.use(
   (response) => response,
-  (error) => {
-    // Handle errors globally (e.g., redirect to login on 401)
+  async (error) => {
+    const originalRequest = error.config;
+
+    // If 401 + not a retry + token exists → Refresh token
+    if (error.response?.status === 401 && !originalRequest._retry) {
+      originalRequest._retry = true; // Mark request to avoid infinite loops
+
+      try {
+        // Call your refresh token endpoint (if using refresh tokens)
+        const newToken = await refreshToken(); // Implement this function
+        localStorage.setItem('token', newToken);
+
+        // Retry original request with new token
+        originalRequest.headers.Authorization = `Bearer ${newToken}`;
+        return api(originalRequest);
+      } catch (refreshError) {
+        // Redirect to login if refresh fails
+        window.location.href = '/login';
+        return Promise.reject(refreshError);
+      }
+    }
+
+    // For other errors, redirect to login
     if (error.response?.status === 401) {
       window.location.href = '/login';
     }
