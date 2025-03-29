@@ -1,0 +1,43 @@
+.medicines-section {
+    padding: 60px 0;
+    background-color: #e3f2fd;
+  }
+  
+  .section-subtitle {
+    text-align: center;
+    color: #555;
+    margin-bottom: 30px;
+    font-size: 1.1rem;
+  }
+  
+  .medicines-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 30px;
+  }
+  
+  .medicine-card {
+    background-color: white;
+    padding: 25px;
+    border-radius: 10px;
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
+  }
+  
+  .medicine-card h3 {
+    color: #1a5276;
+    margin-bottom: 15px;
+  }
+  
+  .medicine-card ul {
+    list-style-type: none;
+  }
+  
+  .medicine-card li {
+    color: #555;
+    padding: 5px 0;
+    border-bottom: 1px solid #eee;
+  }
+  
+  .medicine-card li:last-child {
+    border-bottom: none;
+  }

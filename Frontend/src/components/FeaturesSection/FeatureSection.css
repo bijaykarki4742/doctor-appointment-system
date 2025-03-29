@@ -1,0 +1,29 @@
+.features-section {
+    padding: 60px 0;
+    background-color: #e3f2fd;
+  }
+  
+  .features-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 30px;
+  }
+  
+  .feature-card {
+    background-color: white;
+    padding: 30px;
+    border-radius: 10px;
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
+    text-align: center;
+  }
+  
+  .feature-card h3 {
+    color: #1a5276;
+    margin-bottom: 15px;
+    font-size: 1.3rem;
+  }
+  
+  .feature-card p {
+    color: #555;
+    line-height: 1.6;
+  }
