@@ -1,5 +1,6 @@
 import { Router } from "express";
 import authrouter from "./authRoutes.js";
+import doctorRoutes from "./doctorRoutes.js";
 
 const router = Router();
 
@@ -10,13 +11,14 @@ router.get('/', (req, res) => {
         endpoints: {
             auth: "/v1/api/auth",
             patients: "/patients",
-            doctors: "/doctors",
+            doctors: "/v1/api/doctors",
             admin: "/admin"
         }
     });
 });
 
 router.use('/v1/api/auth',authrouter);
+router.use('/v1/api/doctors',doctorRoutes);
 
 
 export default router;
