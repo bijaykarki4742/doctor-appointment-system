@@ -4,6 +4,7 @@ import { useAuth } from '@/Contexts/AuthContext';
 const Home = () => {
     return (
         <>
+        <div className=""></div>
             <section>
                 <EasyCare />
             </section>
