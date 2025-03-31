@@ -157,9 +157,7 @@ const DrProfile = () => {
                 <label htmlFor="availability">Availability</label>
                 <Input  {...register("location")} id="availability" placeholder="Enter your availability schedule" />
               </div>
-              <div className="">
-                thus is new divs
-              </div>
+              
               <div>
                 <label htmlFor="consultationfee">Consultation Fee</label>
                 <Input  {...register("location")} id="consultationfee" placeholder="Enter your consultation fee" />
