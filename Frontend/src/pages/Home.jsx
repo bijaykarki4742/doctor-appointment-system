@@ -1,5 +1,5 @@
 import EasyCare from '@/containers/EasyCare'
-import { useAuth } from '@/Contexts/AuthContext';
+// import { useAuth } from '@/Contexts/AuthContext';
 
 const Home = () => {
     return (
