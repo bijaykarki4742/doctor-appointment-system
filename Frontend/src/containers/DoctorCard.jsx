@@ -27,13 +27,13 @@ export default function DoctorCard({ doctor }) {
                     </div>
                 </div>
 
-                <div className="mt-4 flex items-center justify-between">
-                    <div>
-                        <p className="text-sm text-muted-foreground">Next Available</p>
-                        <p className="font-medium">
-                            {doctor.nextAvailable.day}, {doctor.nextAvailable.time}
-                        </p>
-                    </div>
+                <div className="mt-4 flex items-center justify-end">
+                    {/*<div>*/}
+                    {/*    <p className="text-sm text-muted-foreground">Next Available</p>*/}
+                    {/*    <p className="font-medium">*/}
+                    {/*        {doctor.nextAvailable.day}, {doctor.nextAvailable.time}*/}
+                    {/*    </p>*/}
+                    {/*</div>*/}
                     <Button className="bg-blue-600 hover:bg-blue-700">Book Now</Button>
                 </div>
             </CardContent>
