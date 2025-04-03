@@ -4,6 +4,7 @@ import EasyCare from '@/containers/EasyCare'
 const Home = () => {
     return (
         <>
+        <div className=""></div>
             <section>
                 <EasyCare />
             </section>

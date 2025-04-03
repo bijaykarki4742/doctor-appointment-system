@@ -127,6 +127,10 @@ export const login = async (req, res) => {
             { expiresIn: '1d' }
         );
 
+        console.log(process.env.JWT_SECRET);
+        console.log(token);
+        
+
         res.json({ success: true, token, user: { email: user.email, role: user.role, } });
     } catch (error) {
         console.error('Login error:', error);

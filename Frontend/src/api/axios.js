@@ -23,31 +23,9 @@ api.interceptors.request.use(
 
 api.interceptors.response.use(
   (response) => response,
-  async (error) => {
-    const originalRequest = error.config;
-
-    // If 401 + not a retry + token exists → Refresh token
-    if (error.response?.status === 401 && !originalRequest._retry) {
-      originalRequest._retry = true; // Mark request to avoid infinite loops
-
-      try {
-        // Call your refresh token endpoint (if using refresh tokens)
-        const newToken = await refreshToken(); // Implement this function
-        localStorage.setItem('token', newToken);
-
-        // Retry original request with new token
-        originalRequest.headers.Authorization = `Bearer ${newToken}`;
-        return api(originalRequest);
-      } catch (refreshError) {
-        // Redirect to login if refresh fails
-        window.location.href = '/login';
-        return Promise.reject(refreshError);
-      }
-    }
-
-    // For other errors, redirect to login
+  (error) => {
     if (error.response?.status === 401) {
-      window.location.href = '/login';
+      console.log(error)
     }
     return Promise.reject(error);
   }
