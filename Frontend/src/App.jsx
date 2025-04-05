@@ -8,6 +8,7 @@ import DrProfile from './pages/DrProfile';
 import Contactus from "@/pages/Contactus.jsx";
 import DoctorList from "@/containers/DoctorList.jsx";
 import BookDoctor from './pages/BookDoctor';
+import ProfileSettings from "@/containers/Profile/ProfileSettings.jsx";
 
 function App() {
 
@@ -23,7 +24,7 @@ function App() {
                 <Route path="/contactUs" element={<Contactus />}></Route>
                 <Route path="/DoctorList" element={<DoctorList />}></Route>
                 <Route path="/bookDoctor" element={<BookDoctor />}></Route>
-
+                <Route path="/Userprofile" element={<ProfileSettings />}></Route>
             </Routes>
         </AuthProvider>
     )
