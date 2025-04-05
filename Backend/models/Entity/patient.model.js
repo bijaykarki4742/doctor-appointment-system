@@ -17,12 +17,16 @@ const PatientSchema = new mongoose.Schema({
         required: [true,"Last name is required"],
         trim: true
     },
+    age:{
+        type:Number,
+        required:[true,"Age is required"]
+    },
     contact: {
         type: String,
         required: [true,"Contact number is required"],
         validate: {
             validator: function (v) {
-                return /\d{10,15}/.test(v);
+                return /\d{10}/.test(v);
             },
             message: props => `${props.value} is not a valid phone number!`
         }

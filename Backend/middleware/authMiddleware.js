@@ -1,5 +1,5 @@
 import jwt, { decode } from 'jsonwebtoken';
-import { User } from '../models/usermodel.js';
+import { User } from '../models/Entity/usermodel.js';
 
 export const authenticate = async (req, res, next) => {
     try {

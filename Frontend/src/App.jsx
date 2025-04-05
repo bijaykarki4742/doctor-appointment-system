@@ -7,6 +7,7 @@ import { AuthProvider } from './Contexts/AuthContext';
 import DrProfile from './pages/DrProfile';
 import Contactus from "@/pages/Contactus.jsx";
 import DoctorList from "@/containers/DoctorList.jsx";
+import BookDoctor from './pages/BookDoctor';
 
 function App() {
 
@@ -21,6 +22,8 @@ function App() {
                 <Route path="/profile" element={<DrProfile />} ></Route>
                 <Route path="/contactUs" element={<Contactus />}></Route>
                 <Route path="/DoctorList" element={<DoctorList />}></Route>
+                <Route path="/bookDoctor" element={<BookDoctor />}></Route>
+
             </Routes>
         </AuthProvider>
     )

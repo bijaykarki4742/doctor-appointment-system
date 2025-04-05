@@ -1,8 +1,8 @@
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
-import { User } from '../models/usermodel.js';
-import { Patient } from '../models/patient.model.js';
-import { Doctor } from '../models/doctor.model.js';
+import { User } from '../models/Entity/usermodel.js';
+import { Patient } from '../models/Entity/patient.model.js';
+import { Doctor } from '../models/Entity/doctor.model.js';
 
 export const signup = async (req, res) => {
     try {

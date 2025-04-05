@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { Search, ChevronDown } from "lucide-react"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
@@ -21,88 +21,7 @@ import {
 } from "@/components/ui/pagination"
 import DoctorCard from "@/containers/DoctorCard.jsx"
 import Navbar from "@/containers/Navbar.jsx";
-
-// Sample doctor data
-const doctors = [
-    {
-        id: 1,
-        name: "Dr. John Smith",
-        specialty: "Cardiologist",
-        rating: 4.8,
-        reviews: "2.1k",
-        location: "New York Medical Center",
-        nextAvailable: {
-            day: "Today",
-            time: "2:00 PM",
-        },
-        image: "/placeholder.svg?height=80&width=80",
-    },
-    {
-        id: 2,
-        name: "Dr. Sarah Johnson",
-        specialty: "Neurologist",
-        rating: 4.9,
-        reviews: "1.8k",
-        location: "Central Hospital",
-        nextAvailable: {
-            day: "Tomorrow",
-            time: "10:00 AM",
-        },
-        image: "/placeholder.svg?height=80&width=80",
-    },
-    {
-        id: 3,
-        name: "Dr. Michael Chen",
-        specialty: "Pediatrician",
-        rating: 4.7,
-        reviews: "1.5k",
-        location: "Children's Hospital",
-        nextAvailable: {
-            day: "Today",
-            time: "4:30 PM",
-        },
-        image: "/placeholder.svg?height=80&width=80",
-    },
-    {
-        id: 4,
-        name: "Dr. Emily Wilson",
-        specialty: "Dermatologist",
-        rating: 4.9,
-        reviews: "2.3k",
-        location: "Skin Care Clinic",
-        nextAvailable: {
-            day: "Tomorrow",
-            time: "1:00 PM",
-        },
-        image: "/placeholder.svg?height=80&width=80",
-    },
-    {
-        id: 5,
-        name: "Dr. Robert Taylor",
-        specialty: "Orthopedist",
-        rating: 4.8,
-        reviews: "1.9k",
-        location: "Sports Medicine Center",
-        nextAvailable: {
-            day: "Today",
-            time: "5:30 PM",
-        },
-        image: "/placeholder.svg?height=80&width=80",
-    },
-    {
-        id: 6,
-        name: "Dr. Lisa Anderson",
-        specialty: "Psychiatrist",
-        rating: 4.9,
-        reviews: "1.7k",
-        location: "Mental Health Institute",
-        nextAvailable: {
-            day: "Tomorrow",
-            time: "11:30 AM",
-        },
-        image: "/placeholder.svg?height=80&width=80",
-    },
-]
+import api from "@/api/axios"
 
 // All specialties for the filter
 const specialties = [
@@ -119,16 +38,45 @@ export default function DoctorList() {
     const [searchQuery, setSearchQuery] = useState("")
     const [selectedSpecialty, setSelectedSpecialty] = useState("All Specialties")
     const [currentPage, setCurrentPage] = useState(1)
+    const [doctors, setDoctors] = useState([])
+    const [loading, setLoading] = useState(true)
+    const [error, setError] = useState(null)
     const doctorsPerPage = 6
+
+    // Fetch doctors from API
+    useEffect(() => {
+        const fetchDoctors = async () => {
+            try {
+                const token = localStorage.getItem("token")
+                if (!token) {
+                    throw new Error("No authentication token found")
+                }
+
+                const response = await api.get("/doctors/get", {
+                    headers: { Authorization: `Bearer ${token}` }
+                })
+                setDoctors(response.data.allDoctors)
+            } catch (error) {
+                setError(error.message)
+                console.error("Failed to fetch doctors:", error)
+            } finally {
+                setLoading(false)
+            }
+        }
+        fetchDoctors()
+    }, [])
 
     // Filter doctors based on search query and specialty
     const filteredDoctors = doctors.filter((doctor) => {
+        const fullName = `${doctor.firstName} ${doctor.lastName}`.toLowerCase()
         const matchesSearch =
-            doctor.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-            doctor.specialty.toLowerCase().includes(searchQuery.toLowerCase()) ||
-            doctor.location.toLowerCase().includes(searchQuery.toLowerCase())
+            fullName.includes(searchQuery.toLowerCase()) ||
+            (doctor.specialization && doctor.specialization.toLowerCase().includes(searchQuery.toLowerCase())) ||
+            (doctor.hospitalAffiliation && doctor.hospitalAffiliation.some(h => h.toLowerCase().includes(searchQuery.toLowerCase())))
 
-        const matchesSpecialty = selectedSpecialty === "All Specialties" || doctor.specialty === selectedSpecialty
+        const matchesSpecialty =
+            selectedSpecialty === "All Specialties" ||
+            (doctor.specialization && doctor.specialization === selectedSpecialty.replace('ist', 'ology').replace('ian', 'ics'))
 
         return matchesSearch && matchesSpecialty
     })
@@ -140,6 +88,9 @@ export default function DoctorList() {
 
     // Change page
     const paginate = (pageNumber) => setCurrentPage(pageNumber)
+
+    if (loading) return <div className="text-center py-8">Loading...</div>
+    if (error) return <div className="text-red-500 text-center py-8">Error: {error}</div>
 
     return (
         <div className="space-y-6">
@@ -158,17 +109,18 @@ export default function DoctorList() {
                     </div>
                     <div className="flex gap-2 w-full sm:w-auto">
                         <Select value={selectedSpecialty} onValueChange={setSelectedSpecialty}>
-                            <SelectTrigger className="w-full sm:w-[180px]">
+                            <SelectTrigger className="w-full sm:w-[180px] bg-white border border-gray-300 shadow-md">
                                 <SelectValue placeholder="All Specialties" />
                             </SelectTrigger>
-                            <SelectContent>
+                            <SelectContent className="bg-white shadow-lg border border-gray-300 rounded-md">
                                 {specialties.map((specialty) => (
-                                    <SelectItem key={specialty} value={specialty}>
+                                    <SelectItem key={specialty} value={specialty} className="hover:bg-gray-100">
                                         {specialty}
                                     </SelectItem>
                                 ))}
                             </SelectContent>
                         </Select>
+
                         <DropdownMenu>
                             <DropdownMenuTrigger asChild>
                                 <Button variant="outline" className="flex gap-2">
@@ -176,19 +128,42 @@ export default function DoctorList() {
                                     <ChevronDown className="h-4 w-4" />
                                 </Button>
                             </DropdownMenuTrigger>
-                            <DropdownMenuContent className="w-56">
-                                <DropdownMenuCheckboxItem checked>Available Today</DropdownMenuCheckboxItem>
-                                <DropdownMenuCheckboxItem>Highly Rated (4.5+)</DropdownMenuCheckboxItem>
-                                <DropdownMenuCheckboxItem>New Patients</DropdownMenuCheckboxItem>
+                            <DropdownMenuContent className="w-56 bg-white shadow-lg border border-gray-300 rounded-md">
+                                <DropdownMenuCheckboxItem checked className="hover:bg-gray-100">
+                                    Available Today
+                                </DropdownMenuCheckboxItem>
+                                <DropdownMenuCheckboxItem className="hover:bg-gray-100">
+                                    Highly Rated (4.5+)
+                                </DropdownMenuCheckboxItem>
+                                <DropdownMenuCheckboxItem className="hover:bg-gray-100">
+                                    New Patients
+                                </DropdownMenuCheckboxItem>
                             </DropdownMenuContent>
                         </DropdownMenu>
                     </div>
                 </div>
 
                 {/* Doctor Cards */}
-                <div className=" mt-5 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <div className="mt-5 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                     {currentDoctors.length > 0 ? (
-                        currentDoctors.map((doctor) => <DoctorCard key={doctor.id} doctor={doctor} />)
+                        currentDoctors.map((doctor) => (
+                            <DoctorCard
+                                key={doctor._id}
+                                doctor={{
+                                    id: doctor._id,
+                                    name: `${doctor.firstName} ${doctor.lastName}`,
+                                    specialty: doctor.specialization || "General Practitioner",
+                                    rating: 4.5, // Default value if not in your data
+                                    reviews: "1.2k", // Default value if not in your data
+                                    location: doctor.hospitalAffiliation?.[0] || "Medical Center",
+                                    nextAvailable: {
+                                        day: "Today",
+                                        time: "2:00 PM"
+                                    },
+                                    image: doctor.profilePicture || "/default-doctor.png"
+                                }}
+                            />
+                        ))
                     ) : (
                         <div className="col-span-full text-center py-8">
                             <p className="text-muted-foreground">No doctors found matching your search criteria.</p>

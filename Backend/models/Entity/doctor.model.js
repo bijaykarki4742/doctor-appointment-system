@@ -16,13 +16,17 @@ const DoctorSchema = new mongoose.Schema({
         required: true,
         trim: true
     },
+    age:{
+        type:Number,
+        required:[true,"Age is required"]
+    },
     contact: {
         type: String,
         required: true,
         unique: [true, "Contact number should be unique"],
         validate: {
             validator: function (v) {
-                return /\d{10,15}/.test(v);
+                return /\d{10}/.test(v);
             },
             message: props => `${props.value} is not a valid phone number!`
         },

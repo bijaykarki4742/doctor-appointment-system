@@ -2,8 +2,21 @@ import { Star, MapPin } from "lucide-react"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
+import { useNavigate } from "react-router-dom";
 
 export default function DoctorCard({ doctor }) {
+    const navigate = useNavigate();
+
+    const handleBookNow = () => {
+        // Pass the doctor data as state when navigating
+        console.log("Current doctor data: ", doctor);
+        navigate('/bookDoctor', {
+            state: {
+                doctor, id: doctor.id // Reference to User model 
+            }
+        });
+        console.log(doctor.id,);
+    }
     return (
         <Card className="overflow-hidden">
             <CardContent className="p-6">
@@ -34,7 +47,7 @@ export default function DoctorCard({ doctor }) {
                     {/*        {doctor.nextAvailable.day}, {doctor.nextAvailable.time}*/}
                     {/*    </p>*/}
                     {/*</div>*/}
-                    <Button className="bg-blue-600 hover:bg-blue-700">Book Now</Button>
+                    <Button className="bg-blue-600 hover:bg-blue-700" onClick={handleBookNow}>Book Now</Button>
                 </div>
             </CardContent>
         </Card>
