@@ -3,48 +3,45 @@ import { Input } from '@/components/ui/input';
 import { Button } from "@/components/ui/button";
 import { useForm } from 'react-hook-form';
 import { useNavigate } from 'react-router-dom';
-import api from '../api/axios';
-import { useAuth } from '@/Contexts/AuthContext';
 
 const Login = () => {
     // Setup react-hook-form
     const { register, handleSubmit, formState: { errors } } = useForm();
     const navigate = useNavigate();
-    const {login} = useAuth(); 
 
-    const [error, setError] = useState('');
+
+    const [isLoggedIn, setIsLoggedIn] = useState(false);
 
     // Function to handle form submission
     const onSubmit = async (data) => {
-
         console.log('Form Data:', data);
-        setError('');
 
         // Prepare data for login API call
-        const loginData = {
-            email: data.email,
-            password: data.password
-        };
+        const { email, password } = data;
 
         try {
-            const response = await api.post('/auth/login', loginData);
+            const response = await fetch('http://localhost:3000/api/login', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ email, password }),
+            });
 
-            if (response.data.success) {
-                login(response.data.token, {
-                  name: response.data.user.name, // Make sure backend returns name
-                  email: response.data.user.email
-                });
+            if (response.ok) {
+                const result = await response.json();
+                console.log('Login successful:', result);
+
+
+                setIsLoggedIn(true);
                 navigate('/');
-              }
-            else {
-                throw new Error(response.data.error || 'Login failed');
+            } else {
+                const error = await response.json();
+                console.error('Login failed:', error.message);
+                // Handle login failure
             }
-        } catch (err) {
-            const errorMessage = err.response?.data?.error ||
-                err.message ||
-                'An error occurred during signup';
-            setError(errorMessage);
-            console.error('Signup error:', err.response?.data || err.message);
+        } catch (error) {
+            console.error('Error:', error);
         }
     };
 
@@ -57,6 +54,15 @@ const Login = () => {
                 </div>
 
                 <div className="flex flex-col items-start mt-10 gap-4">
+                    {/* Full Name Field (Optional in Login) */}
+                    <div className="flex flex-col gap-2">
+                        <label htmlFor="fullName">Full Name</label>
+                        <Input
+                            {...register('fullName')}
+                            id="fullName"
+                            placeholder="Enter your Full Name"
+                        />
+                    </div>
 
                     {/* Email Field */}
                     <div className="flex flex-col gap-2">
@@ -91,7 +97,7 @@ const Login = () => {
 
             {/* Image Section */}
             <div className="flex justify-center w-1/2 items-center">
-                <img src="/docimg.png" alt="Doctor illustration" />
+                <img src="/Doctor.png" alt="Doctor illustration" />
             </div>
         </div>
     );
