@@ -8,7 +8,7 @@ import DrProfile from './pages/DrProfile';
 import Contactus from "@/pages/Contactus.jsx";
 import DoctorList from "@/containers/DoctorList.jsx";
 import BookDoctor from './pages/BookDoctor';
-
+import Dashboard from './pages/Dashboard';
 function App() {
 
     return (
@@ -23,6 +23,7 @@ function App() {
                 <Route path="/contactUs" element={<Contactus />}></Route>
                 <Route path="/DoctorList" element={<DoctorList />}></Route>
                 <Route path="/bookDoctor" element={<BookDoctor />}></Route>
+                <Route path="/dashboard" element={<Dashboard />}></Route>
 
             </Routes>
         </AuthProvider>
