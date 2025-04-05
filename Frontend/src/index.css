@@ -1,2 +1,31 @@
 @import "tailwindcss";
 @import "tw-animate-css";
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+    width: 5px; /* Width of the scrollbar */
+}
+
+::-webkit-scrollbar-thumb {
+    background-color: #00bba7; /* Scrollbar color */
+    border-radius: 20px; /* Rounded corners */
+}
+
+::-webkit-scrollbar-track {
+    background: #f1f1f1; /* Track background */
+}
+
+.spinner{
+    height: 120px;
+    width: 120px;
+    border: 6px solid;
+    border-color: white transparent white transparent;
+    border-radius: 50%;
+    animation: spin 1.3s linear infinite;
+}
+
+@keyframes spin {
+    to {
+        transform: rotate(360deg);
+    }
+}

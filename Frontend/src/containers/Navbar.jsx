@@ -8,10 +8,10 @@ import { useAuth } from "@/Contexts/AuthContext";
 const navLinks = [
   { name: "Home", path: "/" },
   { name: "About", path: "/about" },
-  { name: "Contact", path: "/contact" },
   { name: "Profile", path: "/profile" },
   { name: "Contact", path: "/contactus" },
   { name: "Doctor List", path: "/DoctorList" },
+  { name: "profileSettings", path: "/Userprofile" },
 ];
 
 export default function Navbar() {
