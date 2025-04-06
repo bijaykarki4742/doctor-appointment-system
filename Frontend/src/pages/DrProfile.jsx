@@ -1,11 +1,4 @@
 import api from '@/api/axios';
-import ProfileCard from '@/components/profile/ProfileCard'
-import ProfileLayout from '@/components/profile/ProfileLayout';
-import ProfileTabs from '@/components/profile/ProfileTabs';
-import AboutTab from '@/components/profile/tabs/AboutTab';
-import AppointmentTab from '@/components/profile/tabs/AppointmentTab';
-import ExperienceTab from '@/components/profile/tabs/Experience';
-import ReviewsTab from '@/components/profile/tabs/ReviewsTab';
 import { useEffect, useState } from 'react';
 
 const DrProfile = () => {

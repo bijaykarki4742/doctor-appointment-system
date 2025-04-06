@@ -1,6 +1,7 @@
 import { Router } from "express";
 import authrouter from "./authRoutes.js";
 import doctorRoutes from "./doctorRoutes.js";
+import patientRoutes from "./patientRoutes.js";
 
 const router = Router();
 
@@ -19,6 +20,7 @@ router.get('/', (req, res) => {
 
 router.use('/v1/api/auth',authrouter);
 router.use('/v1/api/doctors',doctorRoutes);
+router.use('/v1/api/patient',patientRoutes);
 
 
 export default router;
