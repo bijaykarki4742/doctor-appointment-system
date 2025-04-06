@@ -11,6 +11,7 @@ const navLinks = [
   { name: "Services", path: "/services" },
   { name: "Contact", path: "/contact" },
   { name: "Profile", path: "/profile" },
+  { name: "Contact", path: "/contactus" },
 ];
 
 export default function Navbar() {

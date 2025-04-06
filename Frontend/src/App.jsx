@@ -5,6 +5,7 @@ import Signup from './pages/Signup';
 import Login from "./pages/Login";
 import { AuthProvider } from './Contexts/AuthContext';
 import DrProfile from './pages/DrProfile';
+import Contactus from "@/pages/Contactus.jsx";
 
 function App() {
 
@@ -17,6 +18,7 @@ function App() {
                 <Route path="/signup" element={<Signup />}></Route>
                 {/* <Route path="/doctorprofile" element={<DoctorProfile />}></Route> */}
                 <Route path="/profile" element={<DrProfile />} ></Route>
+                <Route path="/contactUs" element={<Contactus />}></Route>
             </Routes>
         </AuthProvider>
     )

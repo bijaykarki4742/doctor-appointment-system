@@ -1,12 +1,16 @@
-import { useNavigate } from "react-router-dom";
+// import { useNavigate } from "react-router-dom";
 import Navbar from "./Navbar";
-import { Card, CardDescription, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
-import { useState } from "react";
+// import { Card, CardDescription, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+// import { useState } from "react";
 import { Button } from "@/components/ui/button";
+import FeaturedDoctors from "@/containers/doctor-feature.jsx";
+import BrowseBySpecialty from "@/containers/BrowseBySpecialty.jsx";
+import HowItWorks from "@/containers/HowItWork.jsx";
+import Footer from "@/containers/Footer.jsx";
 
 const EasyCare = () => {
 
-    const navigate = useNavigate();
+    // const navigate = useNavigate();
 
     return (
         <div className="min-h-screen bg-white">
@@ -88,6 +92,10 @@ const EasyCare = () => {
                     </div>
                 </div>
             </div>
+            <FeaturedDoctors></FeaturedDoctors>
+            <BrowseBySpecialty></BrowseBySpecialty>
+            <HowItWorks></HowItWorks>
+            <Footer></Footer>
         </div>
     );
 };
