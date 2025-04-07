@@ -12,13 +12,12 @@ import { useForm } from "react-hook-form"
 import api from "@/api/axios"
 
 export function Appointment({ doctor }) {
-
     const [step, setStep] = useState(1);
     const [date, setDate] = useState();
     const [timeSlot, setTimeSlot] = useState(null);
     const [userData, setUserData] = useState(null);
 
-    const { register, handleSubmit, watch,formState: { errors }, reset } = useForm();
+    const { register, handleSubmit, watch, formState: { errors }, reset } = useForm();
 
     useEffect(() => {
         const fetchUserData = async () => {
@@ -35,7 +34,7 @@ export function Appointment({ doctor }) {
                 if (!response.data.user) {
                     throw new Error("User data not found in response");
                 }
-                console.log("user repsonse data :", response.data.user);
+                console.log("user response data :", response.data.user);
                 setUserData(response.data.user);
             } catch (error) {
                 console.error("Failed to fetch profile", error);
@@ -78,11 +77,11 @@ export function Appointment({ doctor }) {
             console.log("Doctor ;", doctor);
 
             if (!userData?._id) throw new Error("User data not loaded");
-            if (!doctor?.id) throw new Error("No doctor selected")
+            if (!doctor?.id) throw new Error("No doctor selected");
             if (!date) throw new Error("No date selected");
             if (!timeSlot) throw new Error("No time slot selected");
 
-            //popoulate data for appointment
+            // Populate data for appointment
             const appointmentData = {
                 userId: userData._id,
                 doctorId: doctor.id,
@@ -102,11 +101,10 @@ export function Appointment({ doctor }) {
 
             console.log("Appointment created:", response.data);
             handleNext();
-
         } catch (error) {
             console.log("Booking failed:", error);
         }
-    }
+    };
 
     const handleBookAnother = () => {
         console.log("Resetting form for another booking");
@@ -145,21 +143,21 @@ export function Appointment({ doctor }) {
 
             {/* Step 1: Select Date and Time */}
             {step === 1 && (
-                <Card>
-                    <CardHeader>
-                        <CardTitle>Select Date & Time</CardTitle>
-                        <CardDescription>Choose your preferred appointment date and time</CardDescription>
+                <Card className="bg-white shadow-lg rounded-lg overflow-hidden">
+                    <CardHeader className="bg-blue-500 text-white p-4">
+                        <CardTitle className="text-2xl font-bold">Select Date & Time</CardTitle>
+                        <CardDescription className="text-white">Choose your preferred appointment date and time</CardDescription>
                     </CardHeader>
-                    <CardContent className="space-y-4">
+                    <CardContent className="p-6 space-y-4">
                         <div className="flex flex-col space-y-4 md:flex-row md:space-x-4 md:space-y-0">
                             <div className="md:w-1/2">
                                 <div className="space-y-1">
-                                    <div className="font-medium">Date</div>
+                                    <div className="font-medium text-gray-600">Date</div>
                                     <Popover>
                                         <PopoverTrigger asChild>
                                             <Button
                                                 variant="outline"
-                                                className={cn("w-full justify-start text-left font-normal", !date && "text-muted-foreground")}
+                                                className={cn("w-full justify-start text-left font-normal border border-gray-300 rounded-md p-2", !date && "text-muted-foreground")}
                                             >
                                                 <CalendarIcon className="mr-2 h-4 w-4" />
                                                 {date ? format(date, "PPP") : "Select date"}
@@ -179,7 +177,7 @@ export function Appointment({ doctor }) {
                             </div>
                             <div className="md:w-1/2">
                                 <div className="space-y-1">
-                                    <div className="font-medium">Time</div>
+                                    <div className="font-medium text-gray-600">Time</div>
                                     <TimeSlots
                                         selectedTime={timeSlot}
                                         onSelectTime={handleTimeSelect}
@@ -189,11 +187,11 @@ export function Appointment({ doctor }) {
                             </div>
                         </div>
                     </CardContent>
-                    <CardFooter className="flex justify-between">
-                        <Button variant="outline" disabled>
+                    <CardFooter className="flex justify-between p-4">
+                        <Button variant="outline" disabled className="border border-gray-300 text-gray-600 hover:bg-gray-100">
                             Back
                         </Button>
-                        <Button onClick={handleNext} disabled={!date || !timeSlot}>
+                        <Button onClick={handleNext} disabled={!date || !timeSlot} className="bg-blue-500 text-white hover:bg-blue-600">
                             Next
                         </Button>
                     </CardFooter>
@@ -202,21 +200,21 @@ export function Appointment({ doctor }) {
 
             {/* Step 2: Patient Information */}
             {step === 2 && (
-                <Card>
-                    <CardHeader>
-                        <CardTitle>Patient Information</CardTitle>
-                        <CardDescription>Please provide your personal details</CardDescription>
+                <Card className="bg-white shadow-lg rounded-lg overflow-hidden">
+                    <CardHeader className="bg-blue-500 text-white p-4">
+                        <CardTitle className="text-2xl font-bold">Patient Information</CardTitle>
+                        <CardDescription className="text-white">Please provide your personal details</CardDescription>
                     </CardHeader>
-                    <CardContent>
+                    <CardContent className="p-6">
                         <form id="patient-form" onSubmit={handleSubmit(handleConfirm)} className="space-y-4">
                             <div className="grid gap-4 sm:grid-cols-2">
                                 <div className="space-y-2">
-                                    <label htmlFor="name" className="text-sm font-medium">
+                                    <label htmlFor="name" className="text-sm font-medium text-gray-600">
                                         Full Name
                                     </label>
                                     <input
                                         id="name"
-                                        className="input"
+                                        className="w-full border border-gray-300 rounded-md p-2"
                                         placeholder="John Doe"
                                         {...register("name", { required: "Full name is required" })}
                                     />
@@ -225,13 +223,13 @@ export function Appointment({ doctor }) {
                                     )}
                                 </div>
                                 <div className="space-y-2">
-                                    <label htmlFor="email" className="text-sm font-medium">
+                                    <label htmlFor="email" className="text-sm font-medium text-gray-600">
                                         Email
                                     </label>
                                     <input
                                         id="email"
                                         type="email"
-                                        className="input"
+                                        className="w-full border border-gray-300 rounded-md p-2"
                                         placeholder="john.doe@example.com"
                                         {...register("email", {
                                             required: "Email is required",
@@ -246,13 +244,13 @@ export function Appointment({ doctor }) {
                                     )}
                                 </div>
                                 <div className="space-y-2">
-                                    <label htmlFor="phone" className="text-sm font-medium">
+                                    <label htmlFor="phone" className="text-sm font-medium text-gray-600">
                                         Phone Number
                                     </label>
                                     <input
                                         id="phone"
                                         type="tel"
-                                        className="input"
+                                        className="w-full border border-gray-300 rounded-md p-2"
                                         placeholder="(123) 456-7890"
                                         {...register("phone", {
                                             required: "Phone number is required",
@@ -267,12 +265,12 @@ export function Appointment({ doctor }) {
                                     )}
                                 </div>
                                 <div className="space-y-2">
-                                    <label htmlFor="reason" className="text-sm font-medium">
+                                    <label htmlFor="reason" className="text-sm font-medium text-gray-600">
                                         Reason for Visit
                                     </label>
                                     <select
                                         id="reason"
-                                        className="input"
+                                        className="w-full border border-gray-300 rounded-md p-2"
                                         {...register("reason", { required: "Please select a reason" })}
                                     >
                                         <option value="" disabled>
@@ -291,11 +289,11 @@ export function Appointment({ doctor }) {
                             </div>
                         </form>
                     </CardContent>
-                    <CardFooter className="flex justify-between">
-                        <Button variant="outline" onClick={handleBack}>
+                    <CardFooter className="flex justify-between p-4">
+                        <Button variant="outline" onClick={handleBack} className="border border-gray-300 text-gray-600 hover:bg-gray-100">
                             Back
                         </Button>
-                        <Button type="submit" form="patient-form">
+                        <Button type="submit" form="patient-form" className="bg-blue-500 text-white hover:bg-blue-600">
                             Confirm Booking
                         </Button>
                     </CardFooter>

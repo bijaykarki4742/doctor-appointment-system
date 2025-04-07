@@ -1,5 +1,3 @@
-"use client"
-
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -17,18 +15,19 @@ export default function ProfessionalInformation({
                                                     setIsEditing,
                                                 }) {
     return (
-        <Card className="mb-6">
-            <CardHeader>
-                <CardTitle>Professional Information</CardTitle>
+        <Card className="bg-white shadow-lg rounded-lg overflow-hidden mb-8">
+            <CardHeader className="bg-blue-500 text-white p-4">
+                <CardTitle className="text-2xl font-bold">Professional Information</CardTitle>
             </CardHeader>
-            <CardContent className="grid gap-6">
+            <CardContent className="p-6 space-y-6">
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div className="space-y-2">
-                        <Label htmlFor="specialization">Specialization</Label>
+                        <Label htmlFor="specialization" className="text-gray-600 font-medium">Specialization</Label>
                         {isEditing ? (
                             <Select
                                 value={data.specialization}
                                 onValueChange={(value) => handleSelectChange("specialization", value)}
+                                className="w-full border border-gray-300 rounded-md p-2"
                             >
                                 <SelectTrigger id="specialization">
                                     <SelectValue placeholder="Select specialization" />
@@ -46,22 +45,28 @@ export default function ProfessionalInformation({
                                 </SelectContent>
                             </Select>
                         ) : (
-                            <p className="p-2 border rounded-md">{data.specialization}</p>
+                            <p className="p-2 border border-gray-300 rounded-md bg-gray-100">{data.specialization}</p>
                         )}
                     </div>
                     <div className="space-y-2">
-                        <Label htmlFor="licenseNumber">License Number</Label>
+                        <Label htmlFor="licenseNumber" className="text-gray-600 font-medium">License Number</Label>
                         {isEditing ? (
-                            <Input id="licenseNumber" name="licenseNumber" value={data.licenseNumber} onChange={handleChange} />
+                            <Input
+                                id="licenseNumber"
+                                name="licenseNumber"
+                                value={data.licenseNumber}
+                                onChange={handleChange}
+                                className="w-full border border-gray-300 rounded-md p-2"
+                            />
                         ) : (
-                            <p className="p-2 border rounded-md">{data.licenseNumber}</p>
+                            <p className="p-2 border border-gray-300 rounded-md bg-gray-100">{data.licenseNumber}</p>
                         )}
                     </div>
                 </div>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div className="space-y-2">
-                        <Label htmlFor="experience">Years of Experience</Label>
+                        <Label htmlFor="experience" className="text-gray-600 font-medium">Years of Experience</Label>
                         {isEditing ? (
                             <Input
                                 id="experience"
@@ -69,13 +74,14 @@ export default function ProfessionalInformation({
                                 type="number"
                                 value={data.experience.toString()}
                                 onChange={handleChange}
+                                className="w-full border border-gray-300 rounded-md p-2"
                             />
                         ) : (
-                            <p className="p-2 border rounded-md">{data.experience} years</p>
+                            <p className="p-2 border border-gray-300 rounded-md bg-gray-100">{data.experience} years</p>
                         )}
                     </div>
                     <div className="space-y-2">
-                        <Label htmlFor="consultationFee">Consultation Fee ($)</Label>
+                        <Label htmlFor="consultationFee" className="text-gray-600 font-medium">Consultation Fee ($)</Label>
                         {isEditing ? (
                             <Input
                                 id="consultationFee"
@@ -83,15 +89,16 @@ export default function ProfessionalInformation({
                                 type="number"
                                 value={data.consultationFee.toString()}
                                 onChange={handleChange}
+                                className="w-full border border-gray-300 rounded-md p-2"
                             />
                         ) : (
-                            <p className="p-2 border rounded-md">${data.consultationFee}</p>
+                            <p className="p-2 border border-gray-300 rounded-md bg-gray-100">${data.consultationFee}</p>
                         )}
                     </div>
                 </div>
 
                 <div className="space-y-2">
-                    <Label htmlFor="qualifications">Qualifications (comma separated)</Label>
+                    <Label htmlFor="qualifications" className="text-gray-600 font-medium">Qualifications (comma separated)</Label>
                     {isEditing ? (
                         <Input
                             id="qualifications"
@@ -104,16 +111,17 @@ export default function ProfessionalInformation({
                                     .filter((q) => q)
                                 handleSelectChange("qualifications", quals)
                             }}
+                            className="w-full border border-gray-300 rounded-md p-2"
                         />
                     ) : (
-                        <p className="p-2 border rounded-md">
+                        <p className="p-2 border border-gray-300 rounded-md bg-gray-100">
                             {data.qualifications.length > 0 ? data.qualifications.join(", ") : "None specified"}
                         </p>
                     )}
                 </div>
 
                 <div className="space-y-2">
-                    <Label htmlFor="hospitalAffiliation">Hospital Affiliations (comma separated)</Label>
+                    <Label htmlFor="hospitalAffiliation" className="text-gray-600 font-medium">Hospital Affiliations (comma separated)</Label>
                     {isEditing ? (
                         <Input
                             id="hospitalAffiliation"
@@ -126,16 +134,17 @@ export default function ProfessionalInformation({
                                     .filter((a) => a)
                                 handleSelectChange("hospitalAffiliation", affiliations)
                             }}
+                            className="w-full border border-gray-300 rounded-md p-2"
                         />
                     ) : (
-                        <p className="p-2 border rounded-md">
+                        <p className="p-2 border border-gray-300 rounded-md bg-gray-100">
                             {data.hospitalAffiliation.length > 0 ? data.hospitalAffiliation.join(", ") : "None specified"}
                         </p>
                     )}
                 </div>
 
                 <div className="space-y-2">
-                    <Label htmlFor="languagesSpoken">Languages Spoken (comma separated)</Label>
+                    <Label htmlFor="languagesSpoken" className="text-gray-600 font-medium">Languages Spoken (comma separated)</Label>
                     {isEditing ? (
                         <Input
                             id="languagesSpoken"
@@ -148,29 +157,45 @@ export default function ProfessionalInformation({
                                     .filter((l) => l)
                                 handleSelectChange("languagesSpoken", languages)
                             }}
+                            className="w-full border border-gray-300 rounded-md p-2"
                         />
                     ) : (
-                        <p className="p-2 border rounded-md">
+                        <p className="p-2 border border-gray-300 rounded-md bg-gray-100">
                             {data.languagesSpoken.length > 0 ? data.languagesSpoken.join(", ") : "None specified"}
                         </p>
                     )}
                 </div>
 
                 <div className="space-y-2">
-                    <Label htmlFor="bio">Bio</Label>
+                    <Label htmlFor="bio" className="text-gray-600 font-medium">Bio</Label>
                     {isEditing ? (
-                        <Textarea id="bio" name="bio" rows={4} value={data.bio || ""} onChange={handleChange} />
+                        <Textarea
+                            id="bio"
+                            name="bio"
+                            rows={4}
+                            value={data.bio || ""}
+                            onChange={handleChange}
+                            className="w-full border border-gray-300 rounded-md p-2"
+                        />
                     ) : (
-                        <p className="p-2 border rounded-md">{data.bio ? data.bio : "No bio provided"}</p>
+                        <p className="p-2 border border-gray-300 rounded-md bg-gray-100">{data.bio ? data.bio : "No bio provided"}</p>
                     )}
                 </div>
             </CardContent>
             {isEditing && (
-                <CardFooter className="flex justify-end gap-2">
-                    <Button variant="outline" onClick={() => setIsEditing(false)}>
+                <CardFooter className="flex justify-end gap-2 p-4">
+                    <Button
+                        variant="outline"
+                        onClick={() => setIsEditing(false)}
+                        className="border border-gray-300 text-gray-600 hover:bg-gray-100"
+                    >
                         Cancel
                     </Button>
-                    <Button onClick={handleSave} disabled={saving}>
+                    <Button
+                        onClick={handleSave}
+                        disabled={saving}
+                        className="bg-blue-500 text-white hover:bg-blue-600"
+                    >
                         {saving ? (
                             <>
                                 <span className="animate-spin mr-2">⟳</span>
