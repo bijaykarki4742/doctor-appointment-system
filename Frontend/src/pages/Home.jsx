@@ -6,7 +6,11 @@ const Home = () => {
     return (
         <>
             {/* <Navbar></Navbar> */}
-            <EasyCare />
+
+            <Navbar></Navbar>
+            <div className="mt-[30px]">
+                <EasyCare  />
+            </div>
         </>
     );
 };
