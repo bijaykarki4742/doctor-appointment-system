@@ -73,19 +73,13 @@ export default function Dashboard() {
   ]
 
   return (
-    <SidebarProvider>
-      <AppSidebar />
-      <SidebarInset>
-        <div className="flex flex-col h-screen bg-gray-50">
-          <Header user={user} />
-
+        <div className="flex flex-col h-full bg-gray-50">
           <main className="flex-1 p-6 overflow-auto">
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
               {stats.map((stat, index) => (
                 <StatCard key={index} {...stat} />
               ))}
             </div>
-
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               <div className="md:col-span-2">
                 <AppointmentsTable appointments={appointments} />
@@ -96,8 +90,6 @@ export default function Dashboard() {
             </div>
           </main>
         </div>
-      </SidebarInset>
-    </SidebarProvider>
   )
 }
 

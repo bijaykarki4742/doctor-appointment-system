@@ -3,7 +3,7 @@ import { deletePatient, getAllPatients, getPatientById, updatePatient } from '..
 
 const userRoutes = express.Router();
 
-userRoutes.get('/getAllpatients',getAllPatients);
+userRoutes.get('/getAllPatients',getAllPatients);
 userRoutes.get('/getPatientById/:id',getPatientById);
 userRoutes.patch('/update/:id',updatePatient); 
 userRoutes.delete('/delete/:id',deletePatient); 

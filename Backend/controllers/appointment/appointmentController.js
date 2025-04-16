@@ -95,6 +95,8 @@ export const updateAppointment = async (req, res) => {
     const { id } = req.params;
     const updates = req.body;
 
+    console.log(updates);
+
     if (!mongoose.Types.ObjectId.isValid(id)) {
       return res.status(400).json({ error: 'Invalid appointment ID' });
     }
