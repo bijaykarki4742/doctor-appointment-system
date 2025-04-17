@@ -267,11 +267,12 @@ export function AppointmentsTable() {
                     },
                 }),
             });
-            console.log(response);
-            if (!response.ok) {
-                throw new Error("Failed to reschedule appointment");
-            }
 
+            if (!response.ok) {
+                console.error('Request failed with status:', response.status);
+                // Optionally throw an error or handle it gracefully
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
             const updatedAppointment = await response.json();
 
             // Format the new date and time for UI
@@ -304,7 +305,6 @@ export function AppointmentsTable() {
                         : app
                 )
             );
-
             toast({
                 title: "Success",
                 description: "Appointment rescheduled successfully",
@@ -312,7 +312,7 @@ export function AppointmentsTable() {
 
             setIsRescheduleDialogOpen(false);
         } catch (err) {
-            console.error("Error rescheduling appointment:", err);
+            // console.error("Error rescheduling appointment:", err);
             toast({
                 variant: "destructive",
                 title: "Error",
@@ -383,138 +383,205 @@ export function AppointmentsTable() {
 
             {/* Appointment Details Dialog */}
             <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-                {selectedAppointment && (
-                    <DialogContent className="sm:max-w-[500px]">
-                        <DialogHeader>
-                            <DialogTitle>Appointment Details</DialogTitle>
-                            <DialogDescription>View complete information about this appointment</DialogDescription>
-                        </DialogHeader>
+  {selectedAppointment && (
+    <DialogContent className="sm:max-w-[600px] rounded-lg">
+      <DialogHeader>
+        <DialogTitle className="text-2xl font-bold text-gray-900 dark:text-white">
+          Appointment Details
+        </DialogTitle>
+        <DialogDescription className="text-gray-600 dark:text-gray-400">
+          Complete information about this medical appointment
+        </DialogDescription>
+      </DialogHeader>
 
-                        <div className="grid gap-4 py-4">
-                            <div className="flex items-center gap-3">
-                                <Avatar className="h-12 w-12">
-                                    <AvatarFallback>
-                                        {selectedAppointment.patientName.charAt(0)}
-                                    </AvatarFallback>
-                                </Avatar>
-                                <div>
-                                    <h3 className="font-semibold text-lg">{selectedAppointment.patientName}</h3>
-                                </div>
-                                <Badge variant="secondary" className={`ml-auto ${getStatusClass(selectedAppointment.status)}`}>
-                                    {selectedAppointment.status}
-                                </Badge>
-                            </div>
+      <div className="space-y-6 py-4">
+        {/* Patient Header Section */}
+        <div className="flex items-start gap-4">
+          <Avatar className="h-14 w-14 border-2 border-blue-100">
+            <AvatarFallback className="bg-blue-100 text-blue-800 text-lg font-medium">
+              {selectedAppointment.patientName.split(' ').map(n => n[0]).join('')}
+            </AvatarFallback>
+          </Avatar>
+          <div className="flex-1">
+            <div className="flex items-center justify-between">
+              <div>
+                <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
+                  {selectedAppointment.patientName}
+                </h3>
+                <p className="text-sm text-gray-500 dark:text-gray-400">
+                  {selectedAppointment.doctorName}
+                </p>
+              </div>
+              <Badge 
+                variant="outline" 
+                className={`px-3 py-1 rounded-full text-sm font-medium ${getStatusClass(selectedAppointment.status)}`}
+              >
+                {selectedAppointment.status}
+              </Badge>
+            </div>
+          </div>
+        </div>
 
-                            <div className="grid grid-cols-2 gap-4 pt-2">
-                                <div className="flex items-center gap-2">
-                                    <Calendar className="h-4 w-4 text-muted-foreground" />
-                                    <span className="text-sm">{selectedAppointment.date}</span>
-                                </div>
-                                <div className="flex items-center gap-2">
-                                    <Clock className="h-4 w-4 text-muted-foreground" />
-                                    <span className="text-sm">{selectedAppointment.time}</span>
-                                </div>
-                            </div>
+        {/* Appointment Info Cards */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="bg-gray-50 dark:bg-gray-800 p-4 rounded-lg">
+            <div className="flex items-center gap-3 mb-2">
+              <Calendar className="h-5 w-5 text-blue-500" />
+              <h4 className="font-medium text-gray-900 dark:text-white">Date</h4>
+            </div>
+            <p className="text-gray-700 dark:text-gray-300 pl-8">
+              {selectedAppointment.date}
+            </p>
+          </div>
 
-                            <div className="pt-2">
-                                <div className="flex items-center gap-2 mb-1">
-                                    <FileText className="h-4 w-4 text-muted-foreground" />
-                                    <span className="font-medium">Reason</span>
-                                </div>
-                                <p className="text-sm pl-6">{selectedAppointment.reason}</p>
-                            </div>
+          <div className="bg-gray-50 dark:bg-gray-800 p-4 rounded-lg">
+            <div className="flex items-center gap-3 mb-2">
+              <Clock className="h-5 w-5 text-blue-500" />
+              <h4 className="font-medium text-gray-900 dark:text-white">Time</h4>
+            </div>
+            <p className="text-gray-700 dark:text-gray-300 pl-8">
+              {selectedAppointment.time}
+            </p>
+          </div>
+        </div>
 
-                            {selectedAppointment.notes && (
-                                <div className="pt-2">
-                                    <div className="flex items-center gap-2 mb-1">
-                                        <FileText className="h-4 w-4 text-muted-foreground" />
-                                        <span className="font-medium">Notes</span>
-                                    </div>
-                                    <p className="text-sm pl-6">{selectedAppointment.notes}</p>
-                                </div>
-                            )}
+        {/* Details Sections */}
+        <div className="space-y-4">
+          <div className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg p-4">
+            <div className="flex items-center gap-2 mb-3">
+              <FileText className="h-5 w-5 text-blue-500" />
+              <h4 className="font-medium text-gray-900 dark:text-white">Appointment Reason</h4>
+            </div>
+            <p className="text-gray-700 dark:text-gray-300 pl-7">
+              {selectedAppointment.reason || "No reason provided"}
+            </p>
+          </div>
 
-                            {selectedAppointment.prescription &&
-                                selectedAppointment.prescription.medications &&
-                                selectedAppointment.prescription.medications.length > 0 && (
-                                    <div className="pt-2">
-                                        <div className="flex items-center gap-2 mb-1">
-                                            <Pill className="h-4 w-4 text-muted-foreground" />
-                                            <span className="font-medium">Prescription</span>
-                                        </div>
-                                        <div className="pl-6">
-                                            {selectedAppointment.prescription.medications.map((med, index) => (
-                                                <div key={index} className="text-sm mb-1">
-                                                    <span className="font-medium">{med.name}</span>: {med.dosage}, {med.frequency}, {med.duration}
-                                                </div>
-                                            ))}
-                                            {selectedAppointment.prescription.instructions && (
-                                                <p className="text-sm mt-2">
-                                                    <span className="font-medium">Instructions:</span>{" "}
-                                                    {selectedAppointment.prescription.instructions}
-                                                </p>
-                                            )}
-                                        </div>
-                                    </div>
-                                )}
+          {selectedAppointment.notes && (
+            <div className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg p-4">
+              <div className="flex items-center gap-2 mb-3">
+                <ClipboardList className="h-5 w-5 text-blue-500" />
+                <h4 className="font-medium text-gray-900 dark:text-white">Clinical Notes</h4>
+              </div>
+              <p className="text-gray-700 dark:text-gray-300 pl-7 whitespace-pre-line">
+                {selectedAppointment.notes}
+              </p>
+            </div>
+          )}
 
-                            {selectedAppointment.paymentStatus && (
-                                <div className="pt-2">
-                                    <div className="flex items-center gap-2 mb-1">
-                                        <DollarSign className="h-4 w-4 text-muted-foreground" />
-                                        <span className="font-medium">Payment</span>
-                                    </div>
-                                    <div className="pl-6 flex items-center justify-between">
-                                        <span className="text-sm">Status: {selectedAppointment.paymentStatus}</span>
-                                        {selectedAppointment.amount && (
-                                            <span className="text-sm font-medium">${selectedAppointment.amount.toFixed(2)}</span>
-                                        )}
-                                    </div>
-                                </div>
-                            )}
-                        </div>
-
-                        <DialogFooter className="flex gap-2">
-                            {selectedAppointment.status === "Upcoming" && (
-                                <>
-                                    <Button
-                                        variant="outline"
-                                        className="text-red-500 hover:text-red-600 hover:bg-red-50"
-                                        onClick={() => handleCancelAppointment(selectedAppointment.id)}
-                                        disabled={isCancelling}
-                                    >
-                                        {isCancelling ? (
-                                            <>
-                                                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                                                Cancelling...
-                                            </>
-                                        ) : "Cancel Appointment"}
-                                    </Button>
-                                    <Button
-                                        variant="outline"
-                                        className="text-blue-500 hover:text-blue-600 hover:bg-blue-50"
-                                        onClick={() => {
-                                            setIsDialogOpen(false);
-                                            setIsRescheduleDialogOpen(true);
-                                        }}
-                                    >
-                                        Reschedule
-                                    </Button>
-                                    <Button className="bg-blue-500 hover:bg-blue-600">
-                                        Start Appointment
-                                    </Button>
-                                </>
-                            )}
-                            {selectedAppointment.status === "Completed" && (
-                                <Button>View Medical Record</Button>
-                            )}
-                            <Button variant="outline" onClick={() => setIsDialogOpen(false)}>
-                                Close
-                            </Button>
-                        </DialogFooter>
-                    </DialogContent>
+          {selectedAppointment.prescription?.medications?.length > 0 && (
+            <div className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg p-4">
+              <div className="flex items-center gap-2 mb-3">
+                <Pill className="h-5 w-5 text-blue-500" />
+                <h4 className="font-medium text-gray-900 dark:text-white">Prescription</h4>
+              </div>
+              <div className="pl-7 space-y-3">
+                {selectedAppointment.prescription.medications.map((med, index) => (
+                  <div key={index} className="border-l-2 border-blue-200 pl-3">
+                    <p className="font-medium text-gray-900 dark:text-white">{med.name}</p>
+                    <div className="text-sm text-gray-600 dark:text-gray-400 grid grid-cols-3 gap-2 mt-1">
+                      <span>Dose: {med.dosage}</span>
+                      <span>Freq: {med.frequency}</span>
+                      <span>Duration: {med.duration}</span>
+                    </div>
+                  </div>
+                ))}
+                {selectedAppointment.prescription.instructions && (
+                  <div className="mt-3 pt-3 border-t border-gray-100 dark:border-gray-700">
+                    <p className="text-sm font-medium text-gray-900 dark:text-white">Special Instructions:</p>
+                    <p className="text-sm text-gray-600 dark:text-gray-400">
+                      {selectedAppointment.prescription.instructions}
+                    </p>
+                  </div>
                 )}
-            </Dialog>
+              </div>
+            </div>
+          )}
+
+          {selectedAppointment.paymentStatus && (
+            <div className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg p-4">
+              <div className="flex items-center gap-2 mb-3">
+                <DollarSign className="h-5 w-5 text-blue-500" />
+                <h4 className="font-medium text-gray-900 dark:text-white">Payment Information</h4>
+              </div>
+              <div className="pl-7">
+                <div className="flex justify-between items-center">
+                  <span className="text-gray-700 dark:text-gray-300">Status:</span>
+                  <Badge 
+                    variant="outline" 
+                    className={`capitalize ${
+                      selectedAppointment.paymentStatus === 'paid' 
+                        ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200'
+                        : 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200'
+                    }`}
+                  >
+                    {selectedAppointment.paymentStatus}
+                  </Badge>
+                </div>
+                {selectedAppointment.amount && (
+                  <div className="flex justify-between items-center mt-2">
+                    <span className="text-gray-700 dark:text-gray-300">Amount:</span>
+                    <span className="font-medium text-gray-900 dark:text-white">
+                      ${selectedAppointment.amount.toFixed(2)}
+                    </span>
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
+        </div>
+      </div>
+
+      <DialogFooter className="sm:justify-between pt-4 border-t border-gray-200 dark:border-gray-700">
+        <Button 
+          variant="outline" 
+          onClick={() => setIsDialogOpen(false)}
+          className="px-6"
+        >
+          Close
+        </Button>
+        
+        <div className="space-x-2">
+          {selectedAppointment.status === "Upcoming" && (
+            <>
+              <Button
+                variant="outline"
+                className="text-red-600 border-red-200 hover:bg-red-50 hover:text-red-700 px-6"
+                onClick={() => handleCancelAppointment(selectedAppointment.id)}
+                disabled={isCancelling}
+              >
+                {isCancelling ? (
+                  <>
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    Cancelling...
+                  </>
+                ) : "Cancel"}
+              </Button>
+              <Button
+                variant="outline"
+                className="text-blue-600 border-blue-200 hover:bg-blue-50 hover:text-blue-700 px-6"
+                onClick={() => {
+                  setIsDialogOpen(false);
+                  setIsRescheduleDialogOpen(true);
+                }}
+              >
+                Reschedule
+              </Button>
+              <Button className="bg-blue-600 hover:bg-blue-700 px-6">
+                Start Appointment
+              </Button>
+            </>
+          )}
+          {selectedAppointment.status === "Completed" && (
+            <Button className="bg-blue-600 hover:bg-blue-700 px-6">
+              View Full Record
+            </Button>
+          )}
+        </div>
+      </DialogFooter>
+    </DialogContent>
+  )}
+</Dialog>
 
             {/* Reschedule Dialog */}
             <Dialog open={isRescheduleDialogOpen} onOpenChange={setIsRescheduleDialogOpen}>

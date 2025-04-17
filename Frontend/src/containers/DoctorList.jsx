@@ -36,12 +36,11 @@ import api from "@/api/axios"
 // All specialties for the filter
 const specialties = [
     "All Specialties",
-    "Cardiologist",
-    "Neurologist",
-    "Pediatrician",
-    "Dermatologist",
-    "Orthopedist",
-    "Psychiatrist",
+    "Cardiology",
+    "Dermatology",
+    "Pediatrics",
+    "Neurology",
+    "Orthopedics",
 ]
 
 export default function DoctorList() {
