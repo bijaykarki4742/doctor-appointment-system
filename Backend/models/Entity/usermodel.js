@@ -29,7 +29,7 @@ const userSchema = new mongoose.Schema({
     required: true,
     default:"patient"
   },
-  isSuperAdmin: {  // 👈 Flag for full-access admins
+  isSuperAdmin: {  // Flag for full-access admins
     type: Boolean,
     default: false
   },

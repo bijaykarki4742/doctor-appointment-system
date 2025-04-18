@@ -29,10 +29,20 @@ const AppointmentSchema = new mongoose.Schema({
     },
     end: {
       type: String,
+      required: [true, 'End time is required'],
       match: [/^([01]\d|2[0-3]):([0-5]\d)$/, 'Invalid end time format (HH:mm)'],
       validate: {
         validator: function (endTime) {
-          return endTime > this.timeSlot.start;
+          if (!this.start) return true; // Skip if start is missing (handled by 'required')
+          
+          // Convert "HH:mm" to total minutes for comparison
+          const [startHours, startMins] = this.start.split(':').map(Number);
+          const [endHours, endMins] = endTime.split(':').map(Number);
+          
+          const startTotal = startHours * 60 + startMins;
+          const endTotal = endHours * 60 + endMins;
+          
+          return endTotal > startTotal;
         },
         message: 'End time must be after start time'
       }

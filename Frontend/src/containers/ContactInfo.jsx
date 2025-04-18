@@ -1,41 +1,54 @@
 import React from 'react';
-import Navbar from "@/containers/Navbar.jsx";
+import { Phone, Mail, MapPin } from 'lucide-react';
 
 const ContactInfo = () => {
     return (
-        <div className="grid grid-cols-3 gap-8 text-center mb-12">
-            <div className="bg-white p-6 rounded-lg shadow-md">
-                <div className="mb-4 flex justify-center">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-blue-600">
-                        <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/>
-                    </svg>
+        <div className="max-w-6xl mx-auto">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-8 text-center mb-12">
+                {/* Phone Card */}
+                <div className="bg-white p-8 rounded-xl shadow-lg transform transition-all duration-300 hover:shadow-xl hover:-translate-y-1">
+                    <div className="mb-6 flex justify-center">
+                        <div className="p-4 bg-blue-100 rounded-full">
+                            <Phone size={32} className="text-blue-600" />
+                        </div>
+                    </div>
+                    <h3 className="text-2xl font-bold mb-3 text-gray-800">Phone</h3>
+                    <p className="text-gray-600 mb-1 font-medium">(555) 123-4567</p>
+                    <p className="text-gray-500 text-sm">Mon - Fri, 9am - 5pm</p>
+                    <button className="mt-6 bg-blue-600 hover:bg-blue-700 text-white py-2 px-6 rounded-full font-medium transition-all duration-300">
+                        Call Now
+                    </button>
                 </div>
-                <h3 className="text-xl font-semibold mb-2">Phone</h3>
-                <p className="text-gray-600">(555) 123-4567</p>
-                <p className="text-gray-600">Mon - Fri, 9am - 5pm</p>
-            </div>
 
-            <div className="bg-white p-6 rounded-lg shadow-md">
-                <div className="mb-4 flex justify-center">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-blue-600">
-                        <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
-                        <polyline points="22,6 12,13 2,6"/>
-                    </svg>
+                {/* Email Card */}
+                <div className="bg-white p-8 rounded-xl shadow-lg transform transition-all duration-300 hover:shadow-xl hover:-translate-y-1">
+                    <div className="mb-6 flex justify-center">
+                        <div className="p-4 bg-green-100 rounded-full">
+                            <Mail size={32} className="text-green-600" />
+                        </div>
+                    </div>
+                    <h3 className="text-2xl font-bold mb-3 text-gray-800">Email</h3>
+                    <p className="text-gray-600 mb-1 font-medium">contact@medicare.com</p>
+                    <p className="text-gray-500 text-sm">support@medicare.com</p>
+                    <button className="mt-6 bg-green-600 hover:bg-green-700 text-white py-2 px-6 rounded-full font-medium transition-all duration-300">
+                        Send Email
+                    </button>
                 </div>
-                <h3 className="text-xl font-semibold mb-2">Email</h3>
-                <p className="text-gray-600">contact@medicare.com</p>
-                <p className="text-gray-600">support@medicare.com</p>
-            </div>
-            <div className="bg-white p-6 rounded-lg shadow-md">
-                <div className="mb-4 flex justify-center">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-blue-600">
-                        <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/>
-                        <circle cx="12" cy="10" r="3"/>
-                    </svg>
+
+                {/* Location Card */}
+                <div className="bg-white p-8 rounded-xl shadow-lg transform transition-all duration-300 hover:shadow-xl hover:-translate-y-1">
+                    <div className="mb-6 flex justify-center">
+                        <div className="p-4 bg-purple-100 rounded-full">
+                            <MapPin size={32} className="text-purple-600" />
+                        </div>
+                    </div>
+                    <h3 className="text-2xl font-bold mb-3 text-gray-800">Location</h3>
+                    <p className="text-gray-600 mb-1 font-medium">123 Healthcare St</p>
+                    <p className="text-gray-500 text-sm">New York, NY 10001</p>
+                    <button className="mt-6 bg-purple-600 hover:bg-purple-700 text-white py-2 px-6 rounded-full font-medium transition-all duration-300">
+                        Get Directions
+                    </button>
                 </div>
-                <h3 className="text-xl font-semibold mb-2">Location</h3>
-                <p className="text-gray-600">123 Healthcare St</p>
-                <p className="text-gray-600">New York, NY 10001</p>
             </div>
         </div>
     );

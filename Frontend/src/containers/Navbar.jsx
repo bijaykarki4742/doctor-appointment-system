@@ -8,10 +8,10 @@ import { useAuth } from "@/Contexts/AuthContext";
 const navLinks = [
   { name: "Home", path: "/" },
   { name: "About", path: "/about" },
-  { name: "Profile", path: "/profile" },
+  // { name: "Profile", path: "/profile" },
   { name: "Contact", path: "/contactus" },
   { name: "Doctor List", path: "/DoctorList" },
-  { name: "profileSettings", path: "/Userprofile" },
+  { name: "Profile", path: "/Userprofile" },
 ];
 
 export default function Navbar() {
@@ -34,7 +34,7 @@ export default function Navbar() {
         </Link>
 
         {/* Desktop Menu */}
-        <div className="hidden md:flex space-x-6">
+        <div className="hidden md:flex items-center space-x-6">
           {navLinks.map((link) => (
             <Link
               key={link.path}

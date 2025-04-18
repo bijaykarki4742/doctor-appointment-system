@@ -10,7 +10,6 @@ const EasyCare = () => {
     return (
         <div className="min-h-screen bg-white">
             {/* Navigation Bar */}
-            <Navbar></Navbar>
             {/* Main Content */}
             <div className="max-w-6xl mx-auto px-4 py-12">
                 <div className="flex flex-col md:flex-row items-center justify-between">

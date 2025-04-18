@@ -22,7 +22,7 @@ app.use((err, req, res, next) => {
 
 app.use(cors({
     origin: 'http://localhost:5173', // Replace with your frontend URL
-    methods: ['GET', 'POST', 'PUT', 'DELETE'],
+    methods: ['GET', 'POST', 'PUT', 'DELETE',"PATCH"],
     allowedHeaders: ['Content-Type'],
     credentials: true 
 }))

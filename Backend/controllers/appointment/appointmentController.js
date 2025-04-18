@@ -90,10 +90,109 @@ export const getAppointmentById = async (req, res) => {
 };
 
 // Update appointment
+// export const updateAppointment = async (req, res) => {
+//   try {
+//     const { id } = req.params;
+//     const updates = req.body;
+
+//     console.log(updates);
+
+//     if (!mongoose.Types.ObjectId.isValid(id)) {
+//       return res.status(400).json({ error: 'Invalid appointment ID' });
+//     }
+
+//     // Prevent updating patientId or doctorId
+//     // if (updates.patientId || updates.doctorId) {
+//     //   return res.status(400).json({ error: 'Cannot change patient or doctor after creation' });
+//     // }
+
+//     // If updating timeSlot, validate end > start
+//     if (updates.timeSlot?.end && updates.timeSlot?.start && 
+//         updates.timeSlot.end <= updates.timeSlot.start) {
+//       return res.status(400).json({ error: 'End time must be after start time' });
+//     }
+
+//     const appointment = await Appointment.findByIdAndUpdate(
+//       id,
+//       updates,
+//       { new: true, runValidators: true }
+//     ).populate('patientId doctorId');
+
+//     if (!appointment) {
+//       return res.status(404).json({ error: 'Appointment not found' });
+//     }
+
+//     res.status(200).json(appointment);
+//   } catch (error) {
+//     if (error.name === 'ValidationError') {
+//       return res.status(400).json({ error: error.message });
+//     }
+//     res.status(500).json({ error: 'Server error' });
+//   }
+// };
+
+// export const updateAppointment = async (req, res) => {
+//   try {
+//     const { id } = req.params;
+//     const updates = req.body;
+
+//     console.log('Update data:', updates);
+
+//     if (!mongoose.Types.ObjectId.isValid(id)) {
+//       return res.status(400).json({ error: 'Invalid appointment ID' });
+//     }
+
+//     // Prevent updating patientId or doctorId
+//     if (updates.patientId || updates.doctorId) {
+//       return res.status(400).json({ 
+//         error: 'Cannot change patient or doctor after creation' 
+//       });
+//     }
+
+//     // If updating timeSlot, validate times
+//     if (updates.timeSlot) {
+//       const { start, end } = updates.timeSlot;
+      
+//       // If either time is provided, validate the pair
+//       if (start || end) {
+//         if (!start || !end) {
+//           return res.status(400).json({ 
+//             error: 'Must provide both start and end times' 
+//           });
+//         }
+//         if (end <= start) {
+//           return res.status(400).json({ 
+//             error: 'End time must be after start time' 
+//           });
+//         }
+//       }
+//     }
+
+//     const appointment = await Appointment.findByIdAndUpdate(
+//       id,
+//       updates,
+//       { new: true, runValidators: true }
+//     ).populate('patientId doctorId');
+
+//     if (!appointment) {
+//       return res.status(404).json({ error: 'Appointment not found' });
+//     }
+
+//     res.status(200).json(appointment);
+//   } catch (error) {
+//     if (error.name === 'ValidationError') {
+//       return res.status(400).json({ error: error.message });
+//     }
+//     res.status(500).json({ error: 'Server error', details: error.message });
+//   }
+// };
+
 export const updateAppointment = async (req, res) => {
   try {
     const { id } = req.params;
     const updates = req.body;
+
+    console.log('Update data:', updates);
 
     if (!mongoose.Types.ObjectId.isValid(id)) {
       return res.status(400).json({ error: 'Invalid appointment ID' });
@@ -101,18 +200,48 @@ export const updateAppointment = async (req, res) => {
 
     // Prevent updating patientId or doctorId
     if (updates.patientId || updates.doctorId) {
-      return res.status(400).json({ error: 'Cannot change patient or doctor after creation' });
+      return res.status(400).json({ 
+        error: 'Cannot change patient or doctor after creation' 
+      });
     }
 
-    // If updating timeSlot, validate end > start
-    if (updates.timeSlot?.end && updates.timeSlot?.start && 
-        updates.timeSlot.end <= updates.timeSlot.start) {
-      return res.status(400).json({ error: 'End time must be after start time' });
+    // Handle timeSlot updates carefully
+    if (updates.timeSlot) {
+      const existingAppointment = await Appointment.findById(id);
+      if (!existingAppointment) {
+        return res.status(404).json({ error: 'Appointment not found' });
+      }
+
+      // Create a full timeSlot object combining existing and new values
+      const fullTimeSlot = {
+        start: updates.timeSlot.start || existingAppointment.timeSlot.start,
+        end: updates.timeSlot.end || existingAppointment.timeSlot.end
+      };
+
+      // Validate the combined timeSlot
+      if (fullTimeSlot.end <= fullTimeSlot.start) {
+        return res.status(400).json({ 
+          error: 'End time must be after start time' 
+        });
+      }
+
+      // Replace with the validated timeSlot
+      updates.timeSlot = fullTimeSlot;
+    }
+
+    // Handle date validation if date is being updated
+    if (updates.date) {
+      const date = new Date(updates.date);
+      if (date < new Date().setHours(0, 0, 0, 0)) {
+        return res.status(400).json({ 
+          error: 'Appointment date cannot be in the past' 
+        });
+      }
     }
 
     const appointment = await Appointment.findByIdAndUpdate(
       id,
-      updates,
+      { ...updates, updatedAt: Date.now() }, // Explicitly update updatedAt
       { new: true, runValidators: true }
     ).populate('patientId doctorId');
 
@@ -122,10 +251,17 @@ export const updateAppointment = async (req, res) => {
 
     res.status(200).json(appointment);
   } catch (error) {
+    console.error('Update error:', error);
     if (error.name === 'ValidationError') {
-      return res.status(400).json({ error: error.message });
+      return res.status(400).json({ 
+        error: 'Validation error',
+        details: error.message 
+      });
     }
-    res.status(500).json({ error: 'Server error' });
+    res.status(500).json({ 
+      error: 'Server error',
+      details: error.message 
+    });
   }
 };
 
