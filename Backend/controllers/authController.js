@@ -1,4 +1,3 @@
-import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import { User } from '../models/Entity/usermodel.js';
 import { Patient } from '../models/Entity/patient.model.js';

@@ -49,7 +49,6 @@ export default function Navbar() {
           <div className="flex items-center space-x-2">
             {token ? (
               <>
-                <span className="text-gray-700">Welcome, {user?.name || user?.email}</span>
                 <Button onClick={handleLogout}>Logout</Button>
               </>
             ) : (
@@ -92,9 +91,6 @@ export default function Navbar() {
           <div className="px-4 py-2">
             {token ? (
               <>
-                <div className="text-gray-700 py-2">
-                  Welcome, {user?.name || user?.email}
-                </div>
                 <Button
                   className="w-full"
                   onClick={() => {
