@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Menu, X } from "lucide-react";
 import { useAuth } from "@/Contexts/AuthContext";
@@ -7,7 +7,7 @@ import { useAuth } from "@/Contexts/AuthContext";
 // Define your navigation links
 const navLinks = [
   { name: "Home", path: "/" },
-  { name: "About", path: "/about" },
+  // { name: "About", path: "/about" },
   // { name: "Profile", path: "/profile" },
   { name: "Contact", path: "/contactus" },
   { name: "Doctor List", path: "/DoctorList" },
@@ -19,6 +19,22 @@ export default function Navbar() {
   const [menuOpen, setMenuOpen] = useState(false);
   const { token, user, logout } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
+
+  const scrollToSection = (sectionId) => {
+    // Check if we're on the home page
+    if (location.pathname === "/") {
+      const section = document.getElementById(sectionId);
+      if (section) {
+        section.scrollIntoView({ behavior: "smooth" });
+      }
+    } else {
+      // If we're not on the home page, navigate to home and then scroll after page loads
+      // You can use history.push with a state or sessionStorage to indicate where to scroll after navigation
+      sessionStorage.setItem("scrollTo", sectionId);
+      window.location.href = "/";
+    }
+  };
 
   const handleLogout = () => {
     logout();
@@ -45,6 +61,12 @@ export default function Navbar() {
             </Link>
           ))}
 
+          <button
+            onClick={() => scrollToSection("about")}
+            className="text-gray-700 hover:text-blue-600 bg-transparent border-none cursor-pointer"
+          >
+            About Us
+          </button>
 
           <div className="flex items-center space-x-2">
             {token ? (
@@ -87,6 +109,12 @@ export default function Navbar() {
               {link.name}
             </Link>
           ))}
+          <button
+            onClick={() => scrollToSection("about")}
+            className="text-gray-700 px-4 py-2 w-full text-left hover:bg-gray-100  border-none cursor-hand"
+          >
+            About
+          </button>
 
           <div className="px-4 py-2">
             {token ? (

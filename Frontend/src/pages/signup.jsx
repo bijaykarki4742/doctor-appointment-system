@@ -10,6 +10,7 @@ const Signup = () => {
             defaultValues: {
                 role: 'patient',
                 gender: 'male',
+                age: 0,
                 address: {
                     street: '',
                     city: '',
@@ -34,6 +35,19 @@ const Signup = () => {
     const [error, setError] = useState('');
     const navigate = useNavigate();
 
+    // Calculate age from date of birth
+    const calculateAge = (birthDate) => {
+        const today = new Date();
+        const birthDateObj = new Date(birthDate);
+        let age = today.getFullYear() - birthDateObj.getFullYear();
+        const monthDiff = today.getMonth() - birthDateObj.getMonth();
+
+        if (monthDiff < 0 ||
+            (monthDiff === 0 && today.getDate() < birthDateObj.getDate())) {
+            age--;
+        }
+        return age;
+    };
 
     const onSubmit = async (data) => {
         setError('');
@@ -70,6 +84,7 @@ const Signup = () => {
                 licenseNumber: data.licenseNumber,
                 experience: Number(data.experience) || 0, // Ensure number type
                 gender: data.gender || 'Male', // Add gender for doctors
+                age: calculateAge(data.dateOfBirth),
                 qualifications: typeof data.qualifications === 'string'
                     ? data.qualifications.split(',').map(q => q.trim()).filter(Boolean)
                     : data.qualifications || [],

@@ -4,7 +4,7 @@ import EasyCare from '@/containers/EasyCare'
 import Footer from '@/containers/Footer';
 import HowItWorks from '@/containers/HowItWork';
 import Navbar from '@/containers/Navbar';
-// import { useAuth } from '@/Contexts/AuthContext';
+import AboutSection from './About';
 
 const Home = () => {
     return (
@@ -17,8 +17,9 @@ const Home = () => {
                 {/* <FeaturedDoctors></FeaturedDoctors> */}
                 <BrowseBySpecialty></BrowseBySpecialty>
                 <HowItWorks></HowItWorks>
-                <Footer></Footer>
+                <AboutSection></AboutSection>
             </div>
+            <Footer></Footer>
         </>
     );
 };
