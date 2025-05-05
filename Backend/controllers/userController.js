@@ -14,6 +14,8 @@ export const getCurrentUserProfile = async (req, res) => {
         profile = await Patient.findOne({ user: user._id }).populate('user');
       }
   
+      console.log("User Profile:", profile);
+
       res.status(200).json({
         user: {
           _id: user._id,
@@ -21,7 +23,7 @@ export const getCurrentUserProfile = async (req, res) => {
           role: user.role,
           isSuperAdmin: user.isSuperAdmin
         },
-        profile 
+        profile
       });
     } catch (error) {
       res.status(500).json({ error: error.message });

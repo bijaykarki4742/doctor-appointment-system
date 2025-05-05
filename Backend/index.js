@@ -4,6 +4,8 @@ import bodyParser from 'body-parser';
 import cors from 'cors';
 import dotenv from 'dotenv';
 import router from './routes/indexRoute.js';
+import sgMail from '@sendgrid/mail';
+import twilio from 'twilio';
 
 const app = express();
 const PORT = process.env.PORT || 3000;
