@@ -25,7 +25,7 @@ router.get("/v1/api/users/me",authenticate, getCurrentUserProfile);
 router.use('/v1/api/auth',authrouter);
 router.use('/v1/api/doctors',doctorRoutes);
 router.use('/v1/api/users',userRoutes);
-router.use('/v1/api/appointments',appointmentRouter)
+router.use('/v1/api/appointments',appointmentRouter);
 
 
 export default router;

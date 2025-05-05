@@ -14,6 +14,7 @@ import { AppointmentsTable } from "@/containers/dashboard/appointments-table.jsx
 import PatientsPage from "@/containers/dashboard/patients.jsx"
 import { DashboardLayout } from "@/pages/DashboardLayout.jsx"
 import { Outlet } from "react-router-dom"
+import VideoCall from "@/containers/VideoCall.jsx";
 
 function App() {
     return (
@@ -29,6 +30,9 @@ function App() {
                 <Route path="/bookDoctor" element={<BookDoctor />} />
                 <Route path="/dashboard" element={<Dashboard />} />
                 <Route path="/Userprofile" element={<ProfileSettings />} />
+                <Route path="/videoCall/:roomId" element={<VideoCall />} />
+
+
 
                 {/* Dashboard Layout nested routes */}
                 <Route path="/admin" element={<DashboardLayout />}>

@@ -34,12 +34,13 @@ export default function ProfileSettings() {
             const response = await api.get(`/users/me`, {
                 headers: { Authorization: `Bearer ${token}` },
             })
+            console.log(response);
 
             const userRole = response.data.user?.role
             const profileData = response.data.profile
 
             setProfileId(profileData._id)
-
+            console.log(profileId)
             if (userRole === "patient") {
                 setData({
                     firstName: profileData.firstName || "",

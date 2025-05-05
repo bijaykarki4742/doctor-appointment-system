@@ -4,8 +4,11 @@ import bodyParser from 'body-parser';
 import cors from 'cors';
 import dotenv from 'dotenv';
 import router from './routes/indexRoute.js';
+import {setupSocket} from "./Socket.js";
+import * as http from "node:http";
 
 const app = express();
+const server = http.createServer(app);
 const PORT = process.env.PORT || 3000;
 
 dotenv.config();
@@ -35,6 +38,7 @@ connectDB().
     then(() => {
         app.listen(PORT, () => {
             console.log(`Server running on ${PORT}`);
+            setupSocket(server);
         })
     })
     .catch(() => {

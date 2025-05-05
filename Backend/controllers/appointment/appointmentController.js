@@ -1,5 +1,6 @@
 import mongoose from 'mongoose';
 import { Appointment } from '../../models/Services/appointment.model.js';
+import { v4 as uuidv4 } from 'uuid';
 
 // Create a new appointment
 export const createAppointment = async (req, res) => {
@@ -240,3 +241,57 @@ export const addPrescription = async (req, res) => {
     res.status(500).json({ error: 'Server error' });
   }
 };
+// POST /appointments/start-call/:appointmentId
+export const startVideoCall = async (req, res) => {
+  const { appointmentId } = req.params;
+  try {
+    const appointment = await Appointment.findById(appointmentId);
+    if (!appointment) {
+      return res.status(404).json({ error: "Appointment not found" });
+    }
+
+    // If a roomId already exists, return it
+    if (appointment.roomId) {
+      return res.status(200).json({
+        message: "Call already started",
+        roomId: appointment.roomId,
+      });
+    }
+
+    // Generate a new unique roomId
+    const generatedRoomId = uuidv4();
+
+    appointment.roomId = generatedRoomId;
+    await appointment.save();
+
+    res.status(200).json({
+      message: "Room ID created",
+      roomId: generatedRoomId,
+    });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Error starting video call" });
+  }
+};
+
+// GET /appointments/get-room/:appointmentId
+export const getRoomByAppointmentId = async (req, res) => {
+  const { appointmentId } = req.params;
+
+  try {
+    const appointment = await Appointment.findById(appointmentId);
+    if (!appointment) {
+      return res.status(404).json({ error: "Appointment not found" });
+    }
+
+    if (!appointment.roomId) {
+      return res.status(204).json({ message: "Call not started yet" }); // No content
+    }
+
+    res.status(200).json({ roomId: appointment.roomId });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Error getting room ID" });
+  }
+};
+
