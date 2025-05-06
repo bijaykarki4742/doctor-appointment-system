@@ -29,9 +29,11 @@ export function AppointmentsTable() {
     const [rescheduleTime, setRescheduleTime] = useState("");
     const [isCancelling, setIsCancelling] = useState(false);
     const [isRescheduling, setIsRescheduling] = useState(false);
+    const [userRole, setUserRole] = useState("");
 
     // Fetch appointments
     useEffect(() => {
+        setUserRole("doctor");
         const fetchAppointments = async () => {
             try {
                 setLoading(true);
@@ -184,9 +186,61 @@ export function AppointmentsTable() {
         }
     };
 
-    const handleAppointmentAction = (appointment) => {
+    const handleAppointmentAction = async (appointment) => {
         setSelectedAppointment(appointment);
-        setIsDialogOpen(true);
+
+        if (appointment.status === "Upcoming") {
+            if (userRole === "doctor") {
+                try {
+                    const token = localStorage.getItem("token");
+                    const response = await fetch(`api/appointments/start-call/${appointment.id}`, {
+                        method: "POST",
+                        headers: {
+                            Authorization: `Bearer ${token}`,
+                            "Content-Type": "application/json",
+                        },
+                        body: JSON.stringify({ appointmentId: appointment.id }),
+                    });
+
+                    if (!response.ok) {
+                        throw new Error("Failed to start video call");
+                    }
+
+                    const { roomId } = await response.json();
+                    window.location.href = `/videoCall/${roomId}`;
+                } catch (error) {
+                    toast({
+                        variant: "destructive",
+                        title: "Error starting call",
+                        description: error.message,
+                    });
+                }
+            } else if (userRole === "patient") {
+                try {
+                    const token = localStorage.getItem("token");
+                    const response = await fetch(`/api/appointments/get-room/${appointment.id}`, {
+                        headers: {
+                            Authorization: `Bearer ${token}`,
+                        },
+                    });
+
+                    if (!response.ok) {
+                        throw new Error("Failed to join video call");
+                    }
+
+                    const { roomId } = await response.json();
+                    window.location.href = `/videoCall/${roomId}`;
+                } catch (error) {
+                    toast({
+                        variant: "destructive",
+                        title: "Error joining call",
+                        description: error.message,
+                    });
+                }
+            }
+        } else {
+            setIsDialogOpen(true); // Open detail dialog for completed/cancelled
+        }
     };
 
     const handleCancelAppointment = async (appointmentId) => {

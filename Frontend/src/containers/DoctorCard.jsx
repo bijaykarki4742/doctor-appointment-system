@@ -50,7 +50,7 @@ export default function DoctorCard({ doctor }) {
 
                         <div className="space-y-1.5">
                             <h3 className="font-semibold text-lg text-gray-900">{doctor.name}</h3>
-                            <Badge className="bg-blue-100 hover:bg-blue-200 text-blue-700 font-medium border-0">
+                            <Badge className="bg-teal-100 hover:bg-teal-200 text-teal-700 font-medium ">
                                 {doctor.specialty}
                             </Badge>
 
@@ -74,30 +74,29 @@ export default function DoctorCard({ doctor }) {
                         <div className="mt-4 pt-4 border-t border-gray-100">
                             <div className="flex justify-between items-center">
                                 <div className="flex items-center gap-2 text-sm text-gray-600">
-                                    <Clock className="h-4 w-4 text-blue-500" />
+                                    <Clock className="h-4 w-4 text-teal-500" />
                                     <span>Next Available: </span>
                                     <span className="font-medium text-gray-900">
                                         {doctor.nextAvailable.day}, {doctor.nextAvailable.time}
                                     </span>
                                 </div>
-
+{/* 
                                 <Badge variant="outline" className="border-blue-200 text-blue-600 font-normal">
                                     <Calendar className="h-3 w-3 mr-1" />
                                     Virtual Available
-                                </Badge>
+                                </Badge> */}
                             </div>
                         </div>
                     )}
 
                     <div className="mt-4 flex items-center justify-end">
-                        {/*<div className="text-sm text-gray-500 hover:text-blue-600 cursor-pointer flex items-center"*/}
-                        {/*     onClick={() => navigate(`/doctor/${doctor.id}`)}>*/}
-                        {/*    View Profile*/}
-                        {/*    <ChevronRight className="h-4 w-4 ml-1" />*/}
-                        {/*</div>*/}
+                        {/* <div className="text-sm text-gray-500 hover:text-blue-600 cursor-pointer flex items-center"
+                            onClick={() => navigate(`/doctor/${doctor.id}`)}>
+                            View Profile
+                           <ChevronRight className="h-4 w-4 ml-1" />
+                        </div> */}
                         <Button
                             onClick={handleBookNow}
-                            className="bg-blue-600 hover:bg-blue-700 px-6 shadow-sm"
                         >
                             Book Now
                         </Button>

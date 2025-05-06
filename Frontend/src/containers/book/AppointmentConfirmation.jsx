@@ -1,9 +1,43 @@
+import api from "@/api/axios";
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { format } from "date-fns"
 import { Check, Calendar, Clock, User, Mail, Phone, FileText } from "lucide-react"
+import { useEffect, useState } from "react";
 
 export function AppointmentConfirmation({ doctor, date, time, patientInfo, onBookAnother }) {
+
+  const [isSending, setIsSending] = useState(false);
+  const [notificationSent, setNotificationSent] = useState(false);
+  const [error, setError] = useState(null);
+
+  const sendNotifications = async () => {
+    setIsSending(true);
+    setError(null);
+
+    try {
+      const response = await api.post('/sendNotification', {
+        appointmentDetails: {
+          doctor,
+          date: format(date, "PPPP"),
+          time,
+        },
+        patientInfo
+      });
+
+      setNotificationSent(true);
+    } catch (err) {
+      console.log(err)
+      setError(err.response?.data?.error || err.message || 'Failed to send notifications');
+    } finally {
+      setIsSending(false);
+    }
+  };
+
+  useEffect(() => {
+    sendNotifications();
+  }, []);
+
   return (
     <Card className="text-center">
       <CardHeader>
@@ -15,6 +49,20 @@ export function AppointmentConfirmation({ doctor, date, time, patientInfo, onBoo
       </CardHeader>
       <CardContent>
         <div className="mt-4 space-y-4">
+          {/* Notification status */}
+          {isSending && (
+            <div className="text-blue-600 text-sm">Sending notifications...</div>
+          )}
+          {notificationSent && (
+            <div className="text-green-600 text-sm">
+              Confirmation sent to your email and phone
+            </div>
+          )}
+          {error && (
+            <div className="text-red-600 text-sm">
+              Error sending notifications: {error}
+            </div>
+          )}
           <div className="rounded-lg border bg-card p-4">
             <h3 className="mb-2 font-semibold">Appointment Details</h3>
             <div className="space-y-2">
@@ -70,6 +118,7 @@ export function AppointmentConfirmation({ doctor, date, time, patientInfo, onBoo
         <Button onClick={onBookAnother}>Book Another Appointment</Button>
       </CardFooter>
     </Card>
+
   )
 }
 
