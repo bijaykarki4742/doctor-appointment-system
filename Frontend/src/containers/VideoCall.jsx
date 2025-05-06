@@ -7,7 +7,7 @@ import { Badge } from "@/components/ui/badge"
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
 import { useParams } from "react-router-dom";
 
-const SOCKET_SERVER_URL = "http://localhost:5173" // Your backend URL
+const SOCKET_SERVER_URL = "http://localhost:3000" // Your backend URL
 
 
 const VideoCall = () => {
@@ -50,8 +50,14 @@ const VideoCall = () => {
     }
 
     useEffect(() => {
-        const socketInstance = io(SOCKET_SERVER_URL)
-        setSocket(socketInstance)
+        const socketInstance = io(SOCKET_SERVER_URL);
+        setSocket(socketInstance);
+
+        // Error handling
+        socketInstance.on("connect_error", (err) => {
+            console.error("Socket connection error:", err);
+            setCallStatus("Connection error");
+        });
 
         navigator.mediaDevices
             .getUserMedia({ video: true, audio: true })
@@ -67,6 +73,16 @@ const VideoCall = () => {
                 console.error("Error accessing media devices:", error)
                 setCallStatus("Failed to access camera/microphone")
             })
+
+        socketInstance.on("created", () => {
+            // First user - wait for second user
+            setCallStatus("Waiting for other participant...");
+        });
+
+        socketInstance.on("joined", () => {
+            // Second user - connection will be established via offer/answer
+            setCallStatus("Connected to room...");
+        });
 
         socketInstance.on("create-offer", async () => {
             const pc = createPeer()
@@ -109,8 +125,26 @@ const VideoCall = () => {
 
     const createPeer = () => {
         const pc = new RTCPeerConnection({
-            iceServers: [{ urls: "stun:stun.l.google.com:19302" }],
-        })
+            iceServers: [
+                // Free STUN servers
+                { urls: "stun:stun.l.google.com:19302" },
+                { urls: "stun:global.stun.twilio.com:3478" },
+
+                // Your TURN server configuration
+                {
+                    urls: "turn:your-turn-server.com:3478",
+                    username: "your-username",
+                    credential: "your-credential"
+                },
+                // Backup TURN server
+                {
+                    urls: "turn:your-backup-turn-server.com:3478?transport=tcp",
+                    username: "your-username",
+                    credential: "your-credential"
+                }
+            ],
+            iceTransportPolicy: "relay" // Optional: force TURN in development
+        });
 
         pc.onicecandidate = (event) => {
             if (event.candidate && socket) {
@@ -146,23 +180,23 @@ const VideoCall = () => {
 
     const toggleMute = () => {
         if (localStreamRef.current) {
-            const audioTracks = localStreamRef.current.getAudioTracks()
+            const audioTracks = localStreamRef.current.getAudioTracks();
             audioTracks.forEach((track) => {
-                track.enabled = !track.enabled
-            })
-            setIsMuted(!isMuted)
+                track.enabled = !track.enabled;
+            });
+            setIsMuted(!isMuted);
         }
-    }
+    };
 
     const toggleVideo = () => {
         if (localStreamRef.current) {
-            const videoTracks = localStreamRef.current.getVideoTracks()
+            const videoTracks = localStreamRef.current.getVideoTracks();
             videoTracks.forEach((track) => {
-                track.enabled = !track.enabled
-            })
-            setIsVideoOff(!isVideoOff)
+                track.enabled = !track.enabled;
+            });
+            setIsVideoOff(!isVideoOff);
         }
-    }
+    };
 
     const endCall = () => {
         if (socket) {
