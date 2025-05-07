@@ -1,5 +1,3 @@
-// "use client"
-//
 // import { useEffect, useState } from "react"
 // import { format } from "date-fns"
 // import { CalendarIcon, Camera, Settings } from "lucide-react"
