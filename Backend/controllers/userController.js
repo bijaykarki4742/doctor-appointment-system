@@ -13,8 +13,6 @@ export const getCurrentUserProfile = async (req, res) => {
       } else if (user.role === 'patient') {
         profile = await Patient.findOne({ user: user._id }).populate('user');
       }
-  
-      console.log("User Profile:", profile);
 
       res.status(200).json({
         user: {

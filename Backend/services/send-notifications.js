@@ -4,7 +4,7 @@ import twilio from 'twilio';
 // Configure services
 sgMail.setApiKey(process.env.SENDGRID_API_KEY);
 
-const twilioClient = twilio(process.env.TWILIO_ACCOUNT_SID, process.env.TWILIO_AUTH_TOKEN);
+// const twilioClient = twilio(process.env.TWILIO_ACCOUNT_SID, process.env.TWILIO_AUTH_TOKEN);
 
 export default async function handler(req, res) {
   if (req.method !== 'POST') {
@@ -14,11 +14,7 @@ export default async function handler(req, res) {
   const { appointmentDetails, patientInfo } = req.body;
 
   try {
-    // Send email notification
     await sendEmailNotification(appointmentDetails, patientInfo);
-    
-    // Send SMS notification
-    await sendSMSNotification(appointmentDetails, patientInfo);
     
     res.status(200).json({ success: true });
   } catch (error) {
@@ -43,12 +39,4 @@ async function sendEmailNotification(appointment, patient) {
   };
 
   await sgMail.send(msg);
-}
-
-async function sendSMSNotification(appointment, patient) {
-  await twilioClient.messages.create({
-    body: `Your appointment with Dr. ${appointment.doctor.name} is confirmed for ${appointment.date} at ${appointment.time}. Reply STOP to unsubscribe.`,
-    from: process.env.TWILIO_PHONE_NUMBER,
-    to: patient.phone,
-  });
 }

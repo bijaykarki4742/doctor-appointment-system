@@ -10,8 +10,7 @@ import { format } from "date-fns"
 import { AppointmentConfirmation } from "./AppointmentConfirmation"
 import { useForm } from "react-hook-form"
 import api from "@/api/axios"
-import ReviewList from "../review/ReviewList"
-import AppointmentCompleted from "./AppointmentCompleted"
+
 
 export function Appointment({ doctor }) {
     const [step, setStep] = useState(1);
