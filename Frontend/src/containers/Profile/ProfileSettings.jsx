@@ -21,6 +21,7 @@ export default function ProfileSettings() {
     const [saving, setSaving] = useState(false)
     const [error, setError] = useState("")
     const { toast } = useToast()
+
     useEffect(() => {
         fetchUserData()
     }, [])
@@ -90,7 +91,6 @@ export default function ProfileSettings() {
         }
     }
 
-
     const handleSave = () => {
         if (userType === "doctor" || userType === "patient") {
             updateUserProfile({
@@ -107,7 +107,6 @@ export default function ProfileSettings() {
             setIsEditing(false)
         }
     }
-
 
     const updateUserProfile = async ({ role, profileId, data, setSaving, setIsEditing, fetchUserData, toast }) => {
         try {

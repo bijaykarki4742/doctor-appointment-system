@@ -44,22 +44,24 @@ export default function MedicalInformation({ data, isEditing, handleChange, hand
         });
     };
 
-    // Handle adding a new medical condition
     const addMedicalCondition = () => {
-        if (newCondition.condition.trim() && newCondition.diagnosisDate) {
+        if (newCondition.condition.trim()) {
             const updatedMedicalHistory = [
                 ...(data.medicalHistory || []),
                 {
-                    ...newCondition,
-                    diagnosisDate: new Date(newCondition.diagnosisDate),
+                    condition: newCondition.condition.trim(),
+                    diagnosisDate: newCondition.diagnosisDate || null,
+                    treatment: newCondition.treatment || null,
                 },
             ];
+
             handleChange({
                 target: {
                     name: "medicalHistory",
                     value: updatedMedicalHistory,
                 },
             });
+
             setNewCondition({
                 condition: "",
                 diagnosisDate: null,
@@ -68,10 +70,8 @@ export default function MedicalInformation({ data, isEditing, handleChange, hand
         }
     };
 
-    // Handle removing a medical condition
     const removeMedicalCondition = (index) => {
-        const updatedMedicalHistory = [...(data.medicalHistory || [])];
-        updatedMedicalHistory.splice(index, 1);
+        const updatedMedicalHistory = data.medicalHistory.filter((_, i) => i !== index);
         handleChange({
             target: {
                 name: "medicalHistory",
@@ -79,6 +79,42 @@ export default function MedicalInformation({ data, isEditing, handleChange, hand
             },
         });
     };
+
+    // Handle adding a new medical condition
+    // const addMedicalCondition = () => {
+    //     if (newCondition.condition.trim() && newCondition.diagnosisDate) {
+    //         const updatedMedicalHistory = [
+    //             ...(data.medicalHistory || []),
+    //             {
+    //                 ...newCondition,
+    //                 diagnosisDate: new Date(newCondition.diagnosisDate),
+    //             },
+    //         ];
+    //         handleChange({
+    //             target: {
+    //                 name: "medicalHistory",
+    //                 value: updatedMedicalHistory,
+    //             },
+    //         });
+    //         setNewCondition({
+    //             condition: "",
+    //             diagnosisDate: null,
+    //             treatment: "",
+    //         });
+    //     }
+    // };
+
+    // // Handle removing a medical condition
+    // const removeMedicalCondition = (index) => {
+    //     const updatedMedicalHistory = [...(data.medicalHistory || [])];
+    //     updatedMedicalHistory.splice(index, 1);
+    //     handleChange({
+    //         target: {
+    //             name: "medicalHistory",
+    //             value: updatedMedicalHistory,
+    //         },
+    //     });
+    // };
 
     // Handle insurance info changes
     const handleInsuranceChange = (e) => {
@@ -155,13 +191,12 @@ export default function MedicalInformation({ data, isEditing, handleChange, hand
                     </div>
                 </div>
 
-                {/* Medical History */}
                 <div className="space-y-2">
                     <h3 className="text-lg font-medium">Medical History</h3>
                     {isEditing ? (
                         <div className="space-y-4">
                             {/* List of existing conditions */}
-                            {data.medicalHistory && data.medicalHistory.length > 0 && (
+                            {data.medicalHistory?.length > 0 && (
                                 <div className="space-y-2">
                                     {data.medicalHistory.map((condition, index) => (
                                         <div
@@ -171,9 +206,11 @@ export default function MedicalInformation({ data, isEditing, handleChange, hand
                                             <div className="flex-1">
                                                 <p className="font-medium">{condition.condition}</p>
                                                 <p className="text-sm text-muted-foreground">
-                                                    Diagnosed: {format(new Date(condition.diagnosisDate), "PPP")}
+                                                    Diagnosed: {condition.diagnosisDate ? format(new Date(condition.diagnosisDate), "PPP") : "Not specified"}
                                                 </p>
-                                                <p className="text-sm">{condition.treatment}</p>
+                                                {condition.treatment && (
+                                                    <p className="text-sm">{condition.treatment}</p>
+                                                )}
                                             </div>
                                             <Button
                                                 variant="ghost"
@@ -197,7 +234,7 @@ export default function MedicalInformation({ data, isEditing, handleChange, hand
                                         id="condition"
                                         value={newCondition.condition}
                                         onChange={(e) =>
-                                            setNewCondition({ ...newCondition, condition: e.target.value })
+                                            setNewCondition(prev => ({ ...prev, condition: e.target.value }))
                                         }
                                         className="w-full border border-gray-300 rounded-md p-2"
                                     />
@@ -226,7 +263,7 @@ export default function MedicalInformation({ data, isEditing, handleChange, hand
                                                 mode="single"
                                                 selected={newCondition.diagnosisDate}
                                                 onSelect={(date) =>
-                                                    setNewCondition({ ...newCondition, diagnosisDate: date })
+                                                    setNewCondition(prev => ({ ...prev, diagnosisDate: date }))
                                                 }
                                                 initialFocus
                                             />
@@ -237,9 +274,9 @@ export default function MedicalInformation({ data, isEditing, handleChange, hand
                                     <Label htmlFor="treatment" className="text-gray-600 font-medium">Treatment</Label>
                                     <Textarea
                                         id="treatment"
-                                        value={newCondition.treatment}
+                                        value={newCondition.treatment || ''}
                                         onChange={(e) =>
-                                            setNewCondition({ ...newCondition, treatment: e.target.value })
+                                            setNewCondition(prev => ({ ...prev, treatment: e.target.value }))
                                         }
                                         className="w-full border border-gray-300 rounded-md p-2"
                                     />
@@ -247,7 +284,7 @@ export default function MedicalInformation({ data, isEditing, handleChange, hand
                                 <Button
                                     className="mt-2 bg-blue-500 text-white hover:bg-blue-600"
                                     onClick={addMedicalCondition}
-                                    disabled={!newCondition.condition.trim() || !newCondition.diagnosisDate}
+                                    disabled={!newCondition.condition.trim()}
                                 >
                                     <Plus className="h-4 w-4 mr-2" /> Add Condition
                                 </Button>
@@ -255,14 +292,16 @@ export default function MedicalInformation({ data, isEditing, handleChange, hand
                         </div>
                     ) : (
                         <div className="space-y-2">
-                            {data.medicalHistory && data.medicalHistory.length > 0 ? (
+                            {data.medicalHistory?.length > 0 ? (
                                 data.medicalHistory.map((condition, index) => (
                                     <div key={index} className="p-2 border rounded-md bg-gray-100">
                                         <p className="font-medium">{condition.condition}</p>
                                         <p className="text-sm text-muted-foreground">
-                                            Diagnosed: {format(new Date(condition.diagnosisDate), "PPP")}
+                                            Diagnosed: {condition.diagnosisDate ? format(new Date(condition.diagnosisDate), "PPP") : "Not specified"}
                                         </p>
-                                        <p className="text-sm">{condition.treatment}</p>
+                                        {condition.treatment && (
+                                            <p className="text-sm">{condition.treatment}</p>
+                                        )}
                                     </div>
                                 ))
                             ) : (
@@ -271,6 +310,8 @@ export default function MedicalInformation({ data, isEditing, handleChange, hand
                         </div>
                     )}
                 </div>
+                {/* Medical History */}
+
 
                 {/* Allergies */}
                 <div className="space-y-2">
@@ -327,7 +368,7 @@ export default function MedicalInformation({ data, isEditing, handleChange, hand
                                 data.allergies.map((allergy, index) => (
                                     <span
                                         key={index}
-                                        className="bg-muted px-3 py-1 rounded-full"
+                                        className="p-2 border border-gray-300 rounded-md bg-gray-100"
                                     >
                                         {allergy}
                                     </span>
@@ -394,6 +435,7 @@ export default function MedicalInformation({ data, isEditing, handleChange, hand
                     </div>
                 </div>
             </CardContent>
+
             {isEditing && (
                 <CardFooter className="flex justify-end gap-2 p-4">
                     <Button
