@@ -40,20 +40,20 @@ function Calendar({
         ),
         day: cn(
           buttonVariants({ variant: "ghost" }),
-          "size-8 p-0 font-normal aria-selected:opacity-100"
+          "size-8 p-0 font-normal aria-selected:opacity-100 hover:bg-teal-400/20"
         ),
         day_range_start:
-          "day-range-start aria-selected:bg-primary aria-selected:text-primary-foreground",
+          "day-range-start aria-selected:bg-teal-400 aria-selected:text-white",
         day_range_end:
-          "day-range-end aria-selected:bg-primary aria-selected:text-primary-foreground",
+          "day-range-end aria-selected:bg-teal-400 aria-selected:text-white",
         day_selected:
-          "bg-primary text-primary-foreground hover:bg-primary hover:text-primary-foreground focus:bg-primary focus:text-primary-foreground",
-        day_today: "bg-accent text-accent-foreground",
+          "bg-teal-400 text-white hover:bg-teal-500 focus:bg-teal-500",
+        day_today: "bg-teal-400/10 text-teal-400 font-medium",
         day_outside:
           "day-outside text-muted-foreground aria-selected:text-muted-foreground",
         day_disabled: "text-muted-foreground opacity-50",
         day_range_middle:
-          "aria-selected:bg-accent aria-selected:text-accent-foreground",
+          "aria-selected:bg-teal-400/30 aria-selected:text-teal-400",
         day_hidden: "invisible",
         ...classNames,
       }}

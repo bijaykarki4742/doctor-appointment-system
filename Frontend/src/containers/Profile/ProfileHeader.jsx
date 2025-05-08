@@ -106,11 +106,11 @@ export default function ProfileHeader({ data, userType, isEditing, toggleEditMod
 
                             <Button
                                 onClick={toggleEditMode}
-                                className={`gap-2 ${isEditing ? 'bg-gray-800 hover:bg-gray-900' : 'bg-blue-600 hover:bg-blue-700'}`}
+                                className={`gap-2 ${isEditing ? ' text-white bg-blue-600 hover:bg-blue-800' : 'bg-blue-600 hover:bg-blue-700'}`}
                             >
                                 {isEditing ? (
                                     <>
-                                        <User className="h-4 w-4" />
+                                        <User className="h-4 w-4 " />
                                         View Profile
                                     </>
                                 ) : (

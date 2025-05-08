@@ -21,6 +21,7 @@ export default function ProfileSettings() {
     const [saving, setSaving] = useState(false)
     const [error, setError] = useState("")
     const { toast } = useToast()
+
     useEffect(() => {
         fetchUserData()
     }, [])
@@ -34,12 +35,13 @@ export default function ProfileSettings() {
             const response = await api.get(`/users/me`, {
                 headers: { Authorization: `Bearer ${token}` },
             })
+            console.log(response);
 
             const userRole = response.data.user?.role
             const profileData = response.data.profile
 
             setProfileId(profileData._id)
-
+            console.log(profileId)
             if (userRole === "patient") {
                 setData({
                     firstName: profileData.firstName || "",
@@ -90,7 +92,6 @@ export default function ProfileSettings() {
         }
     }
 
-
     const handleSave = () => {
         if (userType === "doctor" || userType === "patient") {
             updateUserProfile({
@@ -107,7 +108,6 @@ export default function ProfileSettings() {
             setIsEditing(false)
         }
     }
-
 
     const updateUserProfile = async ({ role, profileId, data, setSaving, setIsEditing, fetchUserData, toast }) => {
         try {

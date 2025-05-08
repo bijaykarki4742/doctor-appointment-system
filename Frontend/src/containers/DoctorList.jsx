@@ -20,15 +20,6 @@ import {
     PaginationPrevious,
     PaginationEllipsis,
 } from "@/components/ui/pagination"
-import {
-    Card,
-    CardContent,
-    CardDescription,
-    CardFooter,
-    CardHeader,
-    CardTitle,
-} from "@/components/ui/card"
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import DoctorCard from "@/containers/DoctorCard.jsx"
 import Navbar from "@/containers/Navbar.jsx"
 import api from "@/api/axios"
@@ -213,55 +204,6 @@ export default function DoctorList() {
         return items
     }
 
-    // // Enhanced Doctor Card component
-    // const EnhancedDoctorCard = ({ doctor }) => {
-    //     return (
-    //         <Card className="overflow-hidden transition-all duration-300 hover:shadow-lg border-gray-200">
-    //             <div className="relative">
-    //                 {doctor.availableToday && (
-    //                     <Badge className="absolute top-2 right-2 bg-green-500 hover:bg-green-600 text-white">
-    //                         Available Today
-    //                     </Badge>
-    //                 )}
-    //             </div>
-    //             <CardHeader className="flex flex-row items-center space-y-0 pb-2 pt-4">
-    //                 <Avatar className="h-16 w-16 border-2 border-primary/10">
-    //                     <AvatarImage src={doctor.image} alt={doctor.name} />
-    //                     <AvatarFallback className="bg-primary/10 text-primary font-medium">
-    //                         {doctor.name.split(' ').map(n => n[0]).join('')}
-    //                     </AvatarFallback>
-    //                 </Avatar>
-    //                 <div className="ml-4">
-    //                     <CardTitle className="text-lg font-semibold">{doctor.name}</CardTitle>
-    //                     <CardDescription className="text-sm text-gray-600">
-    //                         {doctor.specialty}
-    //                     </CardDescription>
-    //                     <div className="flex items-center mt-1 text-sm">
-    //                         <Star className="h-4 w-4 text-yellow-400 mr-1" />
-    //                         <span className="font-medium">{doctor.rating}</span>
-    //                         <span className="text-gray-500 ml-1">({doctor.reviews} reviews)</span>
-    //                     </div>
-    //                 </div>
-    //             </CardHeader>
-    //             <CardContent className="pt-0">
-    //                 <div className="flex items-start mt-3 text-sm text-gray-600">
-    //                     <MapPin className="h-4 w-4 mr-2 mt-0.5 shrink-0" />
-    //                     <span>{doctor.location}</span>
-    //                 </div>
-    //                 <div className="flex items-center mt-2 text-sm text-gray-600">
-    //                     <Clock className="h-4 w-4 mr-2 shrink-0" />
-    //                     <span>Next available: <span className="font-medium text-primary">{doctor.nextAvailable.day} at {doctor.nextAvailable.time}</span></span>
-    //                 </div>
-    //             </CardContent>
-    //             <CardFooter className="pt-0 pb-4">
-    //                 <Button className="w-full bg-primary hover:bg-primary/90">
-    //                     Book Appointment
-    //                 </Button>
-    //             </CardFooter>
-    //         </Card>
-    //     )
-    // }
-
     return (
         <div className="min-h-screen bg-gray-50">
             <Navbar color="white" />
@@ -307,7 +249,7 @@ export default function DoctorList() {
                                         <span>More Filters</span>
                                     </Button>
                                 </DropdownMenuTrigger>
-                                <DropdownMenuContent className="w-56">
+                                <DropdownMenuContent className="w-56 bg-white">
                                     <DropdownMenuCheckboxItem
                                         checked={filters.availableToday}
                                         onCheckedChange={() => toggleFilter('availableToday')}
@@ -419,7 +361,6 @@ export default function DoctorList() {
                                     </div>
                                 </div>
                             )}
-
                         </>
                     )}
                 </div>

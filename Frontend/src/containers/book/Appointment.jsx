@@ -11,11 +11,13 @@ import { AppointmentConfirmation } from "./AppointmentConfirmation"
 import { useForm } from "react-hook-form"
 import api from "@/api/axios"
 
+
 export function Appointment({ doctor }) {
     const [step, setStep] = useState(1);
     const [date, setDate] = useState();
     const [timeSlot, setTimeSlot] = useState(null);
     const [userData, setUserData] = useState(null);
+    const [userprofileData, setUserProfileData] = useState(null);
 
     const { register, handleSubmit, watch, formState: { errors }, reset } = useForm();
 
@@ -34,8 +36,13 @@ export function Appointment({ doctor }) {
                 if (!response.data.user) {
                     throw new Error("User data not found in response");
                 }
-                console.log("user response data :", response.data.user);
+
+                // console.log("user response data :", response.data.user);
+                // console.log("user profile response data :", response.data.profile);
+
                 setUserData(response.data.user);
+                setUserProfileData(response.data.profile);
+
             } catch (error) {
                 console.error("Failed to fetch profile", error);
             }
@@ -202,35 +209,36 @@ export function Appointment({ doctor }) {
             {step === 2 && (
                 <Card className="bg-white shadow-lg rounded-lg overflow-hidden">
                     <CardHeader className="bg-blue-500 text-white p-4">
-                        <CardTitle className="text-2xl font-bold">Patient Information</CardTitle>
-                        <CardDescription className="text-white">Please provide your personal details</CardDescription>
+                        <CardTitle className="text-2xl font-bold">Why book an Appointment ?</CardTitle>
+                        <CardDescription className="text-white">Select your reason for booking.</CardDescription>
                     </CardHeader>
                     <CardContent className="p-6">
                         <form id="patient-form" onSubmit={handleSubmit(handleConfirm)} className="space-y-4">
                             <div className="grid gap-4 sm:grid-cols-2">
+                                {/* Read-only fields with hidden inputs for form submission */}
                                 <div className="space-y-2">
                                     <label htmlFor="name" className="text-sm font-medium text-gray-600">
                                         Full Name
                                     </label>
+                                    <div className="w-full border border-gray-300 rounded-md p-2 ">
+                                        {userprofileData.firstName} {userprofileData.lastName}
+                                    </div>
                                     <input
-                                        id="name"
-                                        className="w-full border border-gray-300 rounded-md p-2"
-                                        placeholder="John Doe"
+                                        type="hidden"
                                         {...register("name", { required: "Full name is required" })}
+                                        value={`${userprofileData.firstName} ${userprofileData.lastName}`}
                                     />
-                                    {errors.name && (
-                                        <p className="text-sm text-red-500">{errors.name.message}</p>
-                                    )}
                                 </div>
+
                                 <div className="space-y-2">
                                     <label htmlFor="email" className="text-sm font-medium text-gray-600">
                                         Email
                                     </label>
+                                    <div className="w-full border border-gray-300 rounded-md p-2">
+                                        {userData.email}
+                                    </div>
                                     <input
-                                        id="email"
-                                        type="email"
-                                        className="w-full border border-gray-300 rounded-md p-2"
-                                        placeholder="john.doe@example.com"
+                                        type="hidden"
                                         {...register("email", {
                                             required: "Email is required",
                                             pattern: {
@@ -238,20 +246,19 @@ export function Appointment({ doctor }) {
                                                 message: "Invalid email address"
                                             }
                                         })}
+                                        value={userData.email}
                                     />
-                                    {errors.email && (
-                                        <p className="text-sm text-red-500">{errors.email.message}</p>
-                                    )}
                                 </div>
+
                                 <div className="space-y-2">
                                     <label htmlFor="phone" className="text-sm font-medium text-gray-600">
                                         Phone Number
                                     </label>
+                                    <div className="w-full border border-gray-300 rounded-md p-2">
+                                        {userprofileData.contact}
+                                    </div>
                                     <input
-                                        id="phone"
-                                        type="tel"
-                                        className="w-full border border-gray-300 rounded-md p-2"
-                                        placeholder="(123) 456-7890"
+                                        type="hidden"
                                         {...register("phone", {
                                             required: "Phone number is required",
                                             pattern: {
@@ -259,11 +266,11 @@ export function Appointment({ doctor }) {
                                                 message: "Invalid phone number"
                                             }
                                         })}
+                                        value={userprofileData.contact}
                                     />
-                                    {errors.phone && (
-                                        <p className="text-sm text-red-500">{errors.phone.message}</p>
-                                    )}
                                 </div>
+
+                                {/* Editable select field */}
                                 <div className="space-y-2">
                                     <label htmlFor="reason" className="text-sm font-medium text-gray-600">
                                         Reason for Visit
@@ -310,14 +317,16 @@ export function Appointment({ doctor }) {
                     date={date}
                     time={`${timeSlot.start} - ${timeSlot.end}`}
                     patientInfo={{
-                        name: userData.firstName + " " + userData.lastName,
+                        name: userprofileData.firstName + " " + userprofileData.lastName,
                         email: userData.email,
-                        phone: userData.phone, // Make sure this is available in userData
+                        phone: userprofileData.contact,
                         reason: watch('reason') // From react-hook-form
                     }}
                     onBookAnother={handleBookAnother}
                 />
             )}
+
+            {/* <AppointmentCompleted  ></AppointmentCompleted> */}
         </div>
     );
 }

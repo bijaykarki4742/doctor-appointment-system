@@ -17,19 +17,29 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
   SidebarHeader,
-} from "@/components/ui/sidebar"
-import { Link, useLocation } from "react-router-dom"
+} from "@/components/ui/sidebar";
+import { Link, useLocation } from "react-router-dom";
+import { useUserRole } from "@/Contexts/UserContext";
 
 export function AppSidebar({ ...props }) {
-  const location = useLocation()
+  const location = useLocation();
+  const { role, loading } = useUserRole();
+
   const menuItems = [
     { icon: LayoutDashboard, label: "Dashboard", path: "/admin/dashboard" },
-    { icon: Users, label: "Patients", path: "/admin/patients" },
-    { icon: CreditCard, label: "Appointments", path: "/admin/appointTable" },
-    { icon: Users, label: "Customers", path: "/customers" },
-    { icon: BarChart2, label: "Analytics", path: "/analytics" },
+    { icon: Calendar, label: "Appointments", path: "/admin/appointments" },
+    // Only show these if role is 'admin'
+    ...(role === "admin"
+        ? [
+          { icon: Users, label: "Patients", path: "/admin/patients" },
+          { icon: MessageSquare, label: "Doctors", path: "/Doctor" },
+        ]
+        : []),
+    { icon: BarChart3, label: "Profile", path: "/Userprofile" },
     { icon: Settings, label: "Settings", path: "/settings" },
-  ]
+  ];
+
+  if (loading) return null; // or show a loader while fetching role
 
   return (
     <Sidebar {...props} className="border-r bg-background w-64 h-full fixed">
