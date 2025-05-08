@@ -57,7 +57,7 @@ const AppointmentSchema = new mongoose.Schema({
   status: {
     type: String,
     enum: {
-      values: ['scheduled', 'completed', 'cancelled', 'no-show'],
+      values: ['scheduled', 'completed', 'cancelled', 'no-show', 'in-progress'],
       message: 'Invalid status value'
     },
     default: 'scheduled'
@@ -90,6 +90,10 @@ const AppointmentSchema = new mongoose.Schema({
       },
       message: 'Amount must be a valid number'
     }
+  },
+  roomId: {
+    type: String, // UUID used for WebRTC room identification
+    default: null
   },
   createdAt: {
     type: Date,

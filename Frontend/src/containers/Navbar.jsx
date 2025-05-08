@@ -1,24 +1,46 @@
 import { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Menu, X } from "lucide-react";
 import { useAuth } from "@/Contexts/AuthContext";
+import {useUserRole} from "@/Contexts/UserContext.jsx";
 
-// Define your navigation links
-const navLinks = [
-  { name: "Home", path: "/" },
-  { name: "About", path: "/about" },
-  // { name: "Profile", path: "/profile" },
-  { name: "Contact", path: "/contactus" },
-  { name: "Doctor List", path: "/DoctorList" },
-  { name: "Profile", path: "/Userprofile" },
-];
 
 export default function Navbar() {
 
   const [menuOpen, setMenuOpen] = useState(false);
   const { token, user, logout } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
+  const {role , loading} = useUserRole();
+
+  if (loading) return <div>Loading...</div>;
+    const navLinks = [
+      { name: "Home", path: "/" },
+      { name: "Contact", path: "/contactus" },
+      { name: "Doctor List", path: "/DoctorList" },
+      ...(role != null ? [
+        { name: "Dashboard", path: "/admin/Dashboard" },
+      ]: [] ),
+      // ...(role === "patient" ? [
+      //   { name: "Doctor List", path: "/DoctorList" },
+      // ] : []),
+    ];
+
+    const scrollToSection = (sectionId) => {
+    // Check if we're on the home page
+    if (location.pathname === "/") {
+      const section = document.getElementById(sectionId);
+      if (section) {
+        section.scrollIntoView({ behavior: "smooth" });
+      }
+    } else {
+      // If we're not on the home page, navigate to home and then scroll after page loads
+      // You can use history.push with a state or sessionStorage to indicate where to scroll after navigation
+      sessionStorage.setItem("scrollTo", sectionId);
+      window.location.href = "/";
+    }
+  };
 
   const handleLogout = () => {
     logout();
@@ -45,11 +67,16 @@ export default function Navbar() {
             </Link>
           ))}
 
+          <button
+            onClick={() => scrollToSection("about")}
+            className="text-gray-700 hover:text-blue-600 bg-transparent border-none cursor-pointer"
+          >
+            About Us
+          </button>
 
           <div className="flex items-center space-x-2">
             {token ? (
               <>
-                <span className="text-gray-700">Welcome, {user?.name || user?.email}</span>
                 <Button onClick={handleLogout}>Logout</Button>
               </>
             ) : (
@@ -88,13 +115,16 @@ export default function Navbar() {
               {link.name}
             </Link>
           ))}
+          <button
+            onClick={() => scrollToSection("about")}
+            className="text-gray-700 px-4 py-2 w-full text-left hover:bg-gray-100  border-none cursor-hand"
+          >
+            About
+          </button>
 
           <div className="px-4 py-2">
             {token ? (
               <>
-                <div className="text-gray-700 py-2">
-                  Welcome, {user?.name || user?.email}
-                </div>
                 <Button
                   className="w-full"
                   onClick={() => {

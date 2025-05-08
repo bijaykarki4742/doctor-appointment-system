@@ -1,5 +1,6 @@
 import mongoose from 'mongoose';
 import { Appointment } from '../../models/Services/appointment.model.js';
+import { v4 as uuidv4 } from 'uuid';
 
 // Create a new appointment
 export const createAppointment = async (req, res) => {
@@ -89,110 +90,10 @@ export const getAppointmentById = async (req, res) => {
   }
 };
 
-// Update appointment
-// export const updateAppointment = async (req, res) => {
-//   try {
-//     const { id } = req.params;
-//     const updates = req.body;
-
-//     console.log(updates);
-
-//     if (!mongoose.Types.ObjectId.isValid(id)) {
-//       return res.status(400).json({ error: 'Invalid appointment ID' });
-//     }
-
-//     // Prevent updating patientId or doctorId
-//     // if (updates.patientId || updates.doctorId) {
-//     //   return res.status(400).json({ error: 'Cannot change patient or doctor after creation' });
-//     // }
-
-//     // If updating timeSlot, validate end > start
-//     if (updates.timeSlot?.end && updates.timeSlot?.start && 
-//         updates.timeSlot.end <= updates.timeSlot.start) {
-//       return res.status(400).json({ error: 'End time must be after start time' });
-//     }
-
-//     const appointment = await Appointment.findByIdAndUpdate(
-//       id,
-//       updates,
-//       { new: true, runValidators: true }
-//     ).populate('patientId doctorId');
-
-//     if (!appointment) {
-//       return res.status(404).json({ error: 'Appointment not found' });
-//     }
-
-//     res.status(200).json(appointment);
-//   } catch (error) {
-//     if (error.name === 'ValidationError') {
-//       return res.status(400).json({ error: error.message });
-//     }
-//     res.status(500).json({ error: 'Server error' });
-//   }
-// };
-
-// export const updateAppointment = async (req, res) => {
-//   try {
-//     const { id } = req.params;
-//     const updates = req.body;
-
-//     console.log('Update data:', updates);
-
-//     if (!mongoose.Types.ObjectId.isValid(id)) {
-//       return res.status(400).json({ error: 'Invalid appointment ID' });
-//     }
-
-//     // Prevent updating patientId or doctorId
-//     if (updates.patientId || updates.doctorId) {
-//       return res.status(400).json({ 
-//         error: 'Cannot change patient or doctor after creation' 
-//       });
-//     }
-
-//     // If updating timeSlot, validate times
-//     if (updates.timeSlot) {
-//       const { start, end } = updates.timeSlot;
-      
-//       // If either time is provided, validate the pair
-//       if (start || end) {
-//         if (!start || !end) {
-//           return res.status(400).json({ 
-//             error: 'Must provide both start and end times' 
-//           });
-//         }
-//         if (end <= start) {
-//           return res.status(400).json({ 
-//             error: 'End time must be after start time' 
-//           });
-//         }
-//       }
-//     }
-
-//     const appointment = await Appointment.findByIdAndUpdate(
-//       id,
-//       updates,
-//       { new: true, runValidators: true }
-//     ).populate('patientId doctorId');
-
-//     if (!appointment) {
-//       return res.status(404).json({ error: 'Appointment not found' });
-//     }
-
-//     res.status(200).json(appointment);
-//   } catch (error) {
-//     if (error.name === 'ValidationError') {
-//       return res.status(400).json({ error: error.message });
-//     }
-//     res.status(500).json({ error: 'Server error', details: error.message });
-//   }
-// };
-
 export const updateAppointment = async (req, res) => {
   try {
     const { id } = req.params;
     const updates = req.body;
-
-    console.log('Update data:', updates);
 
     if (!mongoose.Types.ObjectId.isValid(id)) {
       return res.status(400).json({ error: 'Invalid appointment ID' });
@@ -340,3 +241,57 @@ export const addPrescription = async (req, res) => {
     res.status(500).json({ error: 'Server error' });
   }
 };
+// POST /appointments/start-call/:appointmentId
+export const startVideoCall = async (req, res) => {
+  const { appointmentId } = req.params;
+  try {
+    const appointment = await Appointment.findById(appointmentId);
+    if (!appointment) {
+      return res.status(404).json({ error: "Appointment not found" });
+    }
+
+    // If a roomId already exists, return it
+    if (appointment.roomId) {
+      return res.status(200).json({
+        message: "Call already started",
+        roomId: appointment.roomId,
+      });
+    }
+
+    // Generate a new unique roomId
+    const generatedRoomId = uuidv4();
+
+    appointment.roomId = generatedRoomId;
+    await appointment.save();
+
+    res.status(200).json({
+      message: "Room ID created",
+      roomId: generatedRoomId,
+    });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Error starting video call" });
+  }
+};
+
+// GET /appointments/get-room/:appointmentId
+export const getRoomByAppointmentId = async (req, res) => {
+  const { appointmentId } = req.params;
+
+  try {
+    const appointment = await Appointment.findById(appointmentId);
+    if (!appointment) {
+      return res.status(404).json({ error: "Appointment not found" });
+    }
+
+    if (!appointment.roomId) {
+      return res.status(204).json({ message: "Call not started yet" }); // No content
+    }
+
+    res.status(200).json({ roomId: appointment.roomId });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Error getting room ID" });
+  }
+};
+
