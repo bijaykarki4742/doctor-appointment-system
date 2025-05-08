@@ -3,16 +3,8 @@ import { Link, useLocation, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Menu, X } from "lucide-react";
 import { useAuth } from "@/Contexts/AuthContext";
+import {useUserRole} from "@/Contexts/UserContext.jsx";
 
-// Define your navigation links
-const navLinks = [
-  { name: "Home", path: "/" },
-  // { name: "About", path: "/about" },
-  // { name: "Profile", path: "/profile" },
-  { name: "Contact", path: "/contactus" },
-  { name: "Doctor List", path: "/DoctorList" },
-  { name: "Profile", path: "/Userprofile" },
-];
 
 export default function Navbar() {
 
@@ -20,8 +12,22 @@ export default function Navbar() {
   const { token, user, logout } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
+  const {role , loading} = useUserRole();
 
-  const scrollToSection = (sectionId) => {
+  if (loading) return <div>Loading...</div>;
+    const navLinks = [
+      { name: "Home", path: "/" },
+      { name: "Contact", path: "/contactus" },
+      { name: "Doctor List", path: "/DoctorList" },
+      ...(role != null ? [
+        { name: "Dashboard", path: "/admin/Dashboard" },
+      ]: [] ),
+      // ...(role === "patient" ? [
+      //   { name: "Doctor List", path: "/DoctorList" },
+      // ] : []),
+    ];
+
+    const scrollToSection = (sectionId) => {
     // Check if we're on the home page
     if (location.pathname === "/") {
       const section = document.getElementById(sectionId);
