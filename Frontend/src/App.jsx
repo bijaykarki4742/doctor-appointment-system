@@ -13,6 +13,9 @@ import ProfileSettings from "@/containers/Profile/ProfileSettings.jsx"
 import { AppointmentsTable } from "@/containers/dashboard/appointments-table.jsx"
 import PatientsPage from "@/containers/dashboard/patients.jsx"
 import { DashboardLayout } from "@/pages/DashboardLayout.jsx"
+import Payment from "./pages/Payment.jsx"
+import PaymentSuccess from "./pages/PaymentSuccess.jsx"
+import PaymentFailure from "./pages/PaymentFailure.jsx"
 import { Outlet } from "react-router-dom"
 
 function App() {
@@ -29,6 +32,11 @@ function App() {
                 <Route path="/bookDoctor" element={<BookDoctor />} />
                 <Route path="/dashboard" element={<Dashboard />} />
                 <Route path="/Userprofile" element={<ProfileSettings />} />
+                
+                {/* Payment Routes */}
+                <Route path="/payment" element={<Payment />} />
+                <Route path="/payment-success" element={<PaymentSuccess />} />
+                <Route path="/payment-failure" element={<PaymentFailure />} />
 
                 {/* Dashboard Layout nested routes */}
                 <Route path="/admin" element={<DashboardLayout />}>

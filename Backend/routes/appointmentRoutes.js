@@ -1,5 +1,6 @@
 import express from 'express';
 import { addPrescription, createAppointment, deleteAppointment, getAppointmentById, getAppointments, updateAppointment, updateAppointmentStatus } from '../controllers/appointment/appointmentController.js';
+import { updatePaymentStatus } from '../controllers/payment/paymentController.js';
 import { authenticate } from '../middleware/authMiddleware.js';
 
 
@@ -14,6 +15,7 @@ appointmentRouter.delete('/:id', authenticate, deleteAppointment);
 
 // Special endpoints
 appointmentRouter.patch('/:id/status', authenticate, updateAppointmentStatus);
+appointmentRouter.patch('/:id/payment', authenticate, updatePaymentStatus);
 appointmentRouter.post('/:id/prescription', authenticate, addPrescription);
 // appointmentRouter.post('/:id/prescription', authenticate, addPrescription);
 

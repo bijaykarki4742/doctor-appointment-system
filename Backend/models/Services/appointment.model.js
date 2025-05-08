@@ -78,8 +78,35 @@ const AppointmentSchema = new mongoose.Schema({
   },
   paymentStatus: {
     type: String,
-    enum: ['pending', 'paid', 'refunded'],
+    enum: ['pending', 'paid', 'refunded', 'failed'],
     default: 'pending'
+  },
+  paymentDetails: {
+    method: {
+      type: String,
+      enum: ['esewa', 'cash', 'card', 'other'],
+      default: null
+    },
+    amount: {
+      type: Number,
+      min: [0, 'Amount cannot be negative']
+    },
+    date: {
+      type: Date
+    },
+    transactionId: {
+      type: String,
+      trim: true
+    },
+    receiptUrl: {
+      type: String,
+      trim: true
+    }
+  },
+  consultationFee: {
+    type: Number,
+    min: [0, 'Consultation fee cannot be negative'],
+    default: 500
   },
   amount: {
     type: Number,

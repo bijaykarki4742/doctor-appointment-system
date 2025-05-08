@@ -17,7 +17,6 @@ const Login = () => {
     // Function to handle form submission
     const onSubmit = async (data) => {
 
-        console.log('Form Data:', data);
         setError('');
 
         // Prepare data for login API call
