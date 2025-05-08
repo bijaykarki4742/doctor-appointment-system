@@ -1,4 +1,15 @@
-import { LayoutDashboard, Calendar, Users, MessageSquare, BarChart3, Settings } from "lucide-react"
+import { 
+  LayoutDashboard, 
+  FileText, 
+  CreditCard, 
+  Box, 
+  ShoppingCart, 
+  Users, 
+  Brush, 
+  BarChart2, 
+  Share2, 
+  Settings 
+} from "lucide-react"
 import {
   Sidebar,
   SidebarContent,
@@ -31,40 +42,45 @@ export function AppSidebar({ ...props }) {
   if (loading) return null; // or show a loader while fetching role
 
   return (
-    <Sidebar {...props} className="border-r bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-      <SidebarHeader className="px-4 py-6">
+    <Sidebar {...props} className="border-r bg-background w-64 h-full fixed">
+      <SidebarHeader className="px-6 py-6 border-b">
         <SidebarMenu>
           <SidebarMenuItem>
-            <SidebarMenuButton size="lg" asChild className="hover:bg-transparent">
+            <SidebarMenuButton size="lg" asChild className="hover:bg-transparent px-0">
               <Link to="/" className="flex items-center gap-3">
-                <img 
-                  src="public/EasyCare.png" 
-                  className="w-10 h-10 rounded-lg border" 
-                  alt="EasyCare Logo" 
-                />
-                <span className="text-lg font-semibold">EasyCare</span>
+                <div className="w-10 h-10 rounded-lg bg-blue-600 flex items-center justify-center">
+                  <span className="text-white font-bold text-lg">US</span>
+                </div>
+                <span className="text-lg font-bold">UScreen</span>
               </Link>
             </SidebarMenuButton>
           </SidebarMenuItem>
         </SidebarMenu>
       </SidebarHeader>
       
-      <SidebarContent className="px-2">
+      <SidebarContent className="px-3 py-4">
         <SidebarMenu>
           {menuItems.map((item) => {
-            const isActive = location.pathname.startsWith(item.path)
+            const isActive = location.pathname === item.path || 
+                           (item.path !== "/" && location.pathname.startsWith(item.path))
             return (
-              <SidebarMenuItem key={item.label}>
+              <SidebarMenuItem key={item.label} className="mb-1">
                 <SidebarMenuButton 
                   asChild
                   variant={isActive ? "secondary" : "ghost"}
-                  className={`w-full justify-start ${isActive ? "font-medium" : ""}`}
+                  className={`w-full justify-start rounded-lg transition-all ${
+                    isActive 
+                      ? "bg-blue-50 text-blue-700 hover:bg-blue-100 font-medium" 
+                      : "hover:bg-gray-100 text-gray-700"
+                  }`}
                 >
-                  <Link to={item.path} className="flex items-center">
-                    <item.icon className={`mr-3 h-5 w-5 ${isActive ? "text-primary" : "text-muted-foreground"}`} />
+                  <Link to={item.path} className="flex items-center py-3 px-3">
+                    <item.icon className={`mr-3 h-5 w-5 ${
+                      isActive ? "text-blue-600" : "text-gray-500"
+                    }`} />
                     <span>{item.label}</span>
                     {isActive && (
-                      <span className="ml-auto h-2 w-2 rounded-full bg-primary" />
+                      <span className="ml-auto h-2 w-2 rounded-full bg-blue-600" />
                     )}
                   </Link>
                 </SidebarMenuButton>
