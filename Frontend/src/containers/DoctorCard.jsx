@@ -4,19 +4,27 @@ import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Card, CardContent } from "@/components/ui/card"
 import { useNavigate } from "react-router-dom"
+import {useUserRole} from "@/Contexts/UserContext.jsx";
 
 export default function DoctorCard({ doctor }) {
     const navigate = useNavigate();
+    const {role , loading } = useUserRole()
 
+    if (loading) return <p>Loading...</p>;
     const handleBookNow = () => {
         // Pass the doctor data as state when navigating
         console.log("Current doctor data: ", doctor);
-        navigate('/bookDoctor', {
-            state: {
-                doctor,
-                id: doctor.id // Reference to User model
-            }
-        });
+        if (role != null) {
+            navigate('/bookDoctor', {
+                state: {
+                    doctor,
+                    id: doctor.id // Reference to User model
+                }
+            });
+        }
+        else{
+            navigate('/Login');
+        }
         console.log(doctor.id);
     }
 

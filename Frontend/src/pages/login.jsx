@@ -11,6 +11,7 @@ import { Alert, AlertDescription } from "@/components/ui/alert"
 // import Link from "next/link"
 import api from "../api/axios"
 import { useAuth } from "@/Contexts/AuthContext"
+import { useUserRole} from "@/Contexts/UserContext.jsx";
 
 const Login = () => {
   // Setup react-hook-form
@@ -24,7 +25,9 @@ const Login = () => {
 
   const [error, setError] = useState("")
   const [rememberMe, setRememberMe] = useState(false)
+  const {role, loading} = useUserRole();
 
+  if (loading) return <p>Loading...</p>;
   // Function to handle form submission
   const onSubmit = async (data) => {
     console.log("Form Data:", data)
@@ -44,7 +47,9 @@ const Login = () => {
           name: response.data.user.name,
           email: response.data.user.email,
         })
-        navigate("/")
+        if (role === 'patient') navigate("/")
+        else if (role === 'admin' || role === 'doctor') navigate("/admin/dashboard");
+
       } else {
         throw new Error(response.data.error || "Login failed")
       }

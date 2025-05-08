@@ -6,19 +6,29 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
   SidebarHeader,
-} from "@/components/ui/sidebar"
-import { Link, useLocation } from "react-router-dom"
+} from "@/components/ui/sidebar";
+import { Link, useLocation } from "react-router-dom";
+import { useUserRole } from "@/Contexts/UserContext";
 
 export function AppSidebar({ ...props }) {
-  const location = useLocation()
+  const location = useLocation();
+  const { role, loading } = useUserRole();
+
   const menuItems = [
     { icon: LayoutDashboard, label: "Dashboard", path: "/admin/dashboard" },
     { icon: Calendar, label: "Appointments", path: "/admin/appointments" },
-    { icon: Users, label: "Patients", path: "/admin/patients" },
-    { icon: MessageSquare, label: "Messages", path: "/messages" },
-    { icon: BarChart3, label: "Reports", path: "/reports" },
+    // Only show these if role is 'admin'
+    ...(role === "admin"
+        ? [
+          { icon: Users, label: "Patients", path: "/admin/patients" },
+          { icon: MessageSquare, label: "Doctors", path: "/Doctor" },
+        ]
+        : []),
+    { icon: BarChart3, label: "Profile", path: "/Userprofile" },
     { icon: Settings, label: "Settings", path: "/settings" },
-  ]
+  ];
+
+  if (loading) return null; // or show a loader while fetching role
 
   return (
     <Sidebar {...props} className="border-r bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
