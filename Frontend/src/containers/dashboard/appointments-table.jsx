@@ -44,6 +44,12 @@ export function AppointmentsTable() {
                 }
 
                 // First fetch user info to get role and ID
+                // const userInfoResponse = await fetch("http://100.64.188.127:3000/v1/api/users/me", {
+                //     headers: {
+                //         Authorization: `Bearer ${token}`,
+                //     },
+                // });
+
                 const userInfoResponse = await fetch("http://localhost:3000/v1/api/users/me", {
                     headers: {
                         Authorization: `Bearer ${token}`,
@@ -54,11 +60,17 @@ export function AppointmentsTable() {
                     throw new Error("Failed to fetch user information");
                 }
 
-                const appointmentsResponse = await fetch("/api/appointments", {
+                const appointmentsResponse = await fetch("http://localhost:3000/v1/api/appointments", {
                     headers: {
                         Authorization: `Bearer ${token}`,
                     },
                 });
+
+                // const appointmentsResponse = await fetch("http://100.64.188.127:3000/v1/api/appointments", {
+                //     headers: {
+                //         Authorization: `Bearer ${token}`,
+                //     },
+                // });
 
                 if (!appointmentsResponse.ok) {
                     throw new Error("Failed to fetch appointments");
@@ -219,7 +231,7 @@ export function AppointmentsTable() {
             if (role === "doctor") {
                 try {
                     const token = localStorage.getItem("token");
-                    const response = await fetch(`api/appointments/start-call/${appointment.id}`, {
+                    const response = await fetch(`http://localhost:3000/v1/api/appointments/start-call/${appointment.id}`, {
                         method: "POST",
                         headers: {
                             Authorization: `Bearer ${token}`,
@@ -244,7 +256,7 @@ export function AppointmentsTable() {
             } else if (role === "patient") {
                 try {
                     const token = localStorage.getItem("token");
-                    const response = await fetch(`/api/appointments/get-room/${appointment.id}`, {
+                    const response = await fetch(`http://localhost:3000/v1/api/appointments/get-room/${appointment.id}`, {
                         headers: {
                             Authorization: `Bearer ${token}`,
                         },
