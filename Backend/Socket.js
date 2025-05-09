@@ -4,7 +4,7 @@ import { Server } from "socket.io";
 export const setupSocket = (httpServer) => {
     const io = new Server(httpServer, {
         cors: {
-            origin: "http://localhost:5173",
+            origin: "*", // replace with your actual local IP
             methods: ["GET", "POST"],
             credentials: true
         }

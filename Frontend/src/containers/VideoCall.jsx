@@ -1,187 +1,232 @@
-import { useEffect, useRef, useState } from "react"
-import io from "socket.io-client"
-import { Phone, PhoneOff, Mic, MicOff, Video, VideoOff, MessageSquare, MoreVertical, Clock, Shield } from "lucide-react"
-import { Button } from "@/components/ui/button"
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { Badge } from "@/components/ui/badge"
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
+import { useEffect, useRef, useState } from "react";
+import { io } from "socket.io-client";
 import { useParams } from "react-router-dom";
 
-const SOCKET_SERVER_URL = "http://localhost:3000" // Your backend URL
-
+const SOCKET_SERVER_URL = "http://localhost:3000";
 
 const VideoCall = () => {
     const { roomId } = useParams();
-    const ROOM_ID = roomId
+    const ROOM_ID = roomId;
 
-    const localVideoRef = useRef(null)
-    const remoteVideoRef = useRef(null)
-    const [socket, setSocket] = useState(null)
-    const [peerConnection, setPeerConnection] = useState(null)
-    const localStreamRef = useRef(null)
+    const localVideoRef = useRef(null);
+    const remoteVideoRef = useRef(null);
+    const localStreamRef = useRef(null);
+    const peerConnectionRef = useRef(null); // Using ref for peer connection
 
-    // UI state
-    const [isConnected, setIsConnected] = useState(false)
-    const [isMuted, setIsMuted] = useState(false)
-    const [isVideoOff, setIsVideoOff] = useState(false)
-    const [callDuration, setCallDuration] = useState(0)
-    const [callStatus, setCallStatus] = useState("Connecting...")
+    const [socket, setSocket] = useState(null);
+    const [isConnected, setIsConnected] = useState(false);
+    const [isMuted, setIsMuted] = useState(false);
+    const [isVideoOff, setIsVideoOff] = useState(false);
+    const [callDuration, setCallDuration] = useState(0);
+    const [callStatus, setCallStatus] = useState("Connecting...");
 
-    // Timer for call duration
+    // Call duration timer
     useEffect(() => {
-        let interval
-
+        let interval;
         if (isConnected) {
-            interval = setInterval(() => {
-                setCallDuration((prev) => prev + 1)
-            }, 1000)
+            interval = setInterval(() => setCallDuration((prev) => prev + 1), 1000);
         }
+        return () => clearInterval(interval);
+    }, [isConnected]);
 
-        return () => {
-            if (interval) clearInterval(interval)
-        }
-    }, [isConnected])
-
-    // Format call duration
     const formatDuration = (seconds) => {
-        const mins = Math.floor(seconds / 60)
-        const secs = seconds % 60
-        return `${mins.toString().padStart(2, "0")}:${secs.toString().padStart(2, "0")}`
-    }
+        const mins = Math.floor(seconds / 60);
+        const secs = seconds % 60;
+        return `${mins.toString().padStart(2, "0")}:${secs.toString().padStart(2, "0")}`;
+    };
+
+    const createPeerConnection = (socketInstance) => {
+        if (!localStreamRef.current) {
+            console.error("localStreamRef is null. Cannot create peer connection.");
+            return null;
+        }
+
+        const pc = new RTCPeerConnection({
+            iceServers: [
+                {
+                    urls: "turn:127.0.0.1:3476",
+                    username: "dasdemo",
+                    credential: "dastesting",
+                },
+                {
+                    urls: "stun:stun.l.google.com:19302" // Adding a fallback STUN server
+                }
+            ],
+        });
+
+        // Add local tracks to the connection
+        localStreamRef.current.getTracks().forEach((track) => {
+            pc.addTrack(track, localStreamRef.current);
+        });
+
+        pc.onicecandidate = (event) => {
+            if (event.candidate) {
+                socketInstance.emit("ice-candidate", { candidate: event.candidate, roomId: ROOM_ID });
+            }
+        };
+
+        pc.ontrack = (event) => {
+            console.log("Received remote tracks:", event.streams);
+            if (event.streams && event.streams.length > 0) {
+                if (remoteVideoRef.current) {
+                    remoteVideoRef.current.srcObject = event.streams[0];
+                    console.log("Remote video stream set");
+                    setIsConnected(true);
+                    setCallStatus("Connected");
+                }
+            }
+        };
+
+        pc.oniceconnectionstatechange = () => {
+            console.log("ICE connection state:", pc.iceConnectionState);
+            if (pc.iceConnectionState === "connected") {
+                setIsConnected(true);
+                setCallStatus("Connected");
+            } else if (["disconnected", "failed"].includes(pc.iceConnectionState)) {
+                setIsConnected(false);
+                setCallStatus("Connection lost");
+            }
+        };
+
+        return pc;
+    };
 
     useEffect(() => {
         const socketInstance = io(SOCKET_SERVER_URL);
         setSocket(socketInstance);
 
-        // Error handling
-        socketInstance.on("connect_error", (err) => {
-            console.error("Socket connection error:", err);
-            setCallStatus("Connection error");
+        const initMedia = async () => {
+            try {
+                const stream = await navigator.mediaDevices.getUserMedia({
+                    video: true,
+                    audio: true
+                });
+                localStreamRef.current = stream;
+                if (localVideoRef.current) {
+                    localVideoRef.current.srcObject = stream;
+                    console.log("Local video stream set");
+                }
+                socketInstance.emit("join-room", ROOM_ID);
+            } catch (err) {
+                console.error("Media access error:", err);
+                setCallStatus("Failed to access media devices");
+            }
+        };
+
+        socketInstance.on("connect", () => {
+            console.log("Connected to socket server:", socketInstance.id);
+            initMedia();
         });
 
-        navigator.mediaDevices
-            .getUserMedia({ video: true, audio: true })
-            .then((stream) => {
-                localStreamRef.current = stream
-                if (localVideoRef.current) {
-                    localVideoRef.current.srcObject = stream
-                }
-                socketInstance.emit("join-room", ROOM_ID)
-                setCallStatus("Waiting for other participant...")
-            })
-            .catch((error) => {
-                console.error("Error accessing media devices:", error)
-                setCallStatus("Failed to access camera/microphone")
-            })
-
         socketInstance.on("created", () => {
-            // First user - wait for second user
-            setCallStatus("Waiting for other participant...");
+            console.log("Room created");
+            setCallStatus("Waiting for another participant...");
         });
 
         socketInstance.on("joined", () => {
-            // Second user - connection will be established via offer/answer
-            setCallStatus("Connected to room...");
+            console.log("Joined room");
+            setCallStatus("Connected to room");
         });
 
         socketInstance.on("create-offer", async () => {
-            const pc = createPeer()
-            setPeerConnection(pc)
-            const offer = await pc.createOffer()
-            await pc.setLocalDescription(offer)
-            socketInstance.emit("offer", { offer, roomId: ROOM_ID })
-        })
-
-        socketInstance.on("offer", async ({ offer }) => {
-            const pc = createPeer()
-            setPeerConnection(pc)
-            await pc.setRemoteDescription(new RTCSessionDescription(offer))
-            const answer = await pc.createAnswer()
-            await pc.setLocalDescription(answer)
-            socketInstance.emit("answer", { answer, roomId: ROOM_ID })
-        })
-
-        socketInstance.on("answer", async ({ answer }) => {
-            if (peerConnection) {
-                await peerConnection.setRemoteDescription(new RTCSessionDescription(answer))
-                setIsConnected(true)
-                setCallStatus("Connected")
+            console.log("Creating offer...");
+            if (!localStreamRef.current) {
+                console.error("Local stream not available for creating offer");
+                return;
             }
-        })
 
-        socketInstance.on("ice-candidate", async ({ candidate }) => {
-            if (peerConnection && candidate) {
-                await peerConnection.addIceCandidate(new RTCIceCandidate(candidate))
+            const pc = createPeerConnection(socketInstance);
+            if (!pc) return;
+
+            peerConnectionRef.current = pc;
+
+            try {
+                const offer = await pc.createOffer({
+                    offerToReceiveAudio: true,
+                    offerToReceiveVideo: true
+                });
+                await pc.setLocalDescription(offer);
+                socketInstance.emit("offer", { offer, roomId: ROOM_ID });
+            } catch (err) {
+                console.error("Error creating offer:", err);
             }
-        })
-
-        return () => {
-            socketInstance.disconnect()
-            if (localStreamRef.current) {
-                localStreamRef.current.getTracks().forEach((track) => track.stop())
-            }
-        }
-    }, [])
-
-    const createPeer = () => {
-        const pc = new RTCPeerConnection({
-            iceServers: [
-                // Free STUN servers
-                { urls: "stun:stun.l.google.com:19302" },
-                { urls: "stun:global.stun.twilio.com:3478" },
-
-                // Your TURN server configuration
-                {
-                    urls: "turn:your-turn-server.com:3478",
-                    username: "your-username",
-                    credential: "your-credential"
-                },
-                // Backup TURN server
-                {
-                    urls: "turn:your-backup-turn-server.com:3478?transport=tcp",
-                    username: "your-username",
-                    credential: "your-credential"
-                }
-            ],
-            iceTransportPolicy: "relay" // Optional: force TURN in development
         });
 
-        pc.onicecandidate = (event) => {
-            if (event.candidate && socket) {
-                socket.emit("ice-candidate", { candidate: event.candidate, roomId: ROOM_ID })
-            }
-        }
+        socketInstance.on("offer", async ({ offer }) => {
+            console.log("Received offer");
 
-        pc.ontrack = (event) => {
-            if (remoteVideoRef.current) {
-                remoteVideoRef.current.srcObject = event.streams[0]
-                setIsConnected(true)
-                setCallStatus("Connected")
-            }
-        }
-
-        pc.oniceconnectionstatechange = () => {
-            if (pc.iceConnectionState === "disconnected" || pc.iceConnectionState === "failed") {
-                setIsConnected(false)
-                setCallStatus("Connection lost")
-            }
-        }
-
-        if (localStreamRef.current) {
-            localStreamRef.current.getTracks().forEach((track) => {
-                if (localStreamRef.current) {
-                    pc.addTrack(track, localStreamRef.current)
+            // Ensure local media is ready
+            if (!localStreamRef.current) {
+                try {
+                    const stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
+                    localStreamRef.current = stream;
+                    if (localVideoRef.current) {
+                        localVideoRef.current.srcObject = stream;
+                    }
+                } catch (err) {
+                    console.error("Media access error (offer):", err);
+                    return;
                 }
-            })
-        }
+            }
 
-        return pc
-    }
+            const pc = createPeerConnection(socketInstance);
+            if (!pc) return;
+
+            peerConnectionRef.current = pc;
+
+            try {
+                await pc.setRemoteDescription(new RTCSessionDescription(offer));
+                const answer = await pc.createAnswer({
+                    offerToReceiveAudio: true,
+                    offerToReceiveVideo: true
+                });
+                await pc.setLocalDescription(answer);
+                socketInstance.emit("answer", { answer, roomId: ROOM_ID });
+            } catch (err) {
+                console.error("Error handling offer:", err);
+            }
+        });
+
+        socketInstance.on("answer", async ({ answer }) => {
+            console.log("Received answer");
+            if (peerConnectionRef.current) {
+                try {
+                    await peerConnectionRef.current.setRemoteDescription(new RTCSessionDescription(answer));
+                } catch (err) {
+                    console.error("Error setting remote description:", err);
+                }
+            }
+        });
+
+        socketInstance.on("ice-candidate", async ({ candidate }) => {
+            console.log("Received ICE candidate");
+            if (peerConnectionRef.current) {
+                try {
+                    await peerConnectionRef.current.addIceCandidate(new RTCIceCandidate(candidate));
+                } catch (err) {
+                    console.error("Error adding ICE candidate:", err);
+                }
+            }
+        });
+
+        socketInstance.on("disconnect", () => {
+            console.log("Disconnected from socket server");
+            setCallStatus("Disconnected");
+            setIsConnected(false);
+        });
+
+        return () => {
+            socketInstance.disconnect();
+            if (peerConnectionRef.current) peerConnectionRef.current.close();
+            if (localStreamRef.current) {
+                localStreamRef.current.getTracks().forEach((track) => track.stop());
+            }
+        };
+    }, []);
 
     const toggleMute = () => {
         if (localStreamRef.current) {
-            const audioTracks = localStreamRef.current.getAudioTracks();
-            audioTracks.forEach((track) => {
+            localStreamRef.current.getAudioTracks().forEach((track) => {
                 track.enabled = !track.enabled;
             });
             setIsMuted(!isMuted);
@@ -190,8 +235,7 @@ const VideoCall = () => {
 
     const toggleVideo = () => {
         if (localStreamRef.current) {
-            const videoTracks = localStreamRef.current.getVideoTracks();
-            videoTracks.forEach((track) => {
+            localStreamRef.current.getVideoTracks().forEach((track) => {
                 track.enabled = !track.enabled;
             });
             setIsVideoOff(!isVideoOff);
@@ -199,136 +243,58 @@ const VideoCall = () => {
     };
 
     const endCall = () => {
-        if (socket) {
-            socket.disconnect()
-        }
-        if (peerConnection) {
-            peerConnection.close()
-        }
+        if (socket) socket.disconnect();
+        if (peerConnectionRef.current) peerConnectionRef.current.close();
         if (localStreamRef.current) {
-            localStreamRef.current.getTracks().forEach((track) => track.stop())
+            localStreamRef.current.getTracks().forEach((track) => track.stop());
         }
-        setIsConnected(false)
-        setCallStatus("Call ended")
-
-        // Redirect or show end call screen
-        // window.location.href = "/call-ended";
-    }
+        setIsConnected(false);
+        setCallStatus("Call ended");
+    };
 
     return (
-        <div className="flex flex-col h-screen bg-gray-50">
-            {/* Header */}
-            <div className="bg-white border-b p-4 flex justify-between items-center">
-                <div className="flex items-center gap-2">
-                    <img src="public/EasyCare.png" className="w-[24px] h-[24px]"/>
-                    <h1 className="text-lg font-semibold">Easy Care</h1>
+        <div style={{ textAlign: "center", padding: 20 }}>
+            <div style={{ display: "flex", justifyContent: "center", gap: "20px" }}>
+                <div>
+                    <h3>You</h3>
+                    <video
+                        ref={localVideoRef}
+                        autoPlay
+                        muted
+                        playsInline
+                        style={{ width: 300, border: "2px solid blue", borderRadius: "8px" }}
+                    />
                 </div>
-                <div className="flex items-center gap-3">
-                    <Badge variant={isConnected ? "success" : "secondary"} className="gap-1 px-2 py-1">
-                        <Clock className="h-3 w-3" />
-                        {formatDuration(callDuration)}
-                    </Badge>
-                    <Badge variant="outline" className="gap-1">
-                        {callStatus}
-                    </Badge>
-                </div>
-            </div>
-
-            {/* Video Container */}
-            <div className="flex-1 flex flex-col md:flex-row p-4 gap-4 overflow-hidden">
-                {/* Remote Video (Doctor/Patient) - Larger */}
-                <div className="relative flex-1 min-h-[300px] bg-black rounded-xl overflow-hidden">
-                    <video ref={remoteVideoRef} autoPlay className="w-full h-full object-cover" />
-
-                    {!isConnected && (
-                        <div className="absolute inset-0 flex items-center justify-center bg-gray-900/50 text-white">
-                            <div className="text-center">
-                                <div className="animate-pulse mb-2">
-                                    <Phone className="h-12 w-12 mx-auto" />
-                                </div>
-                                <p>{callStatus}</p>
-                            </div>
-                        </div>
-                    )}
-
-                    <div className="absolute top-4 left-4 flex items-center gap-2">
-                        <Avatar className="border-2 border-white">
-                            <AvatarImage src="/placeholder.svg?height=40&width=40" alt="Remote user" />
-                            <AvatarFallback>DR</AvatarFallback>
-                        </Avatar>
-                        <div className="bg-black/50 text-white px-2 py-1 rounded-md text-sm">Dr. Smith</div>
-                    </div>
-                </div>
-
-                {/* Local Video (Self view) - Smaller */}
-                <div className="relative md:w-1/4 h-[200px] md:h-auto bg-gray-800 rounded-xl overflow-hidden">
-                    <video ref={localVideoRef} autoPlay muted className="w-full h-full object-cover" />
-
-                    {isVideoOff && (
-                        <div className="absolute inset-0 flex items-center justify-center bg-gray-900 text-white">
-                            <Avatar className="h-20 w-20">
-                                <AvatarFallback>YOU</AvatarFallback>
-                            </Avatar>
-                        </div>
-                    )}
-
-                    <div className="absolute top-2 right-2">
-                        <Badge variant="secondary" className="text-xs">
-                            You
-                        </Badge>
-                    </div>
+                <div>
+                    <h3>Remote</h3>
+                    <video
+                        ref={remoteVideoRef}
+                        autoPlay
+                        playsInline
+                        style={{ width: 300, border: "2px solid green", borderRadius: "8px" }}
+                    />
                 </div>
             </div>
-
-            {/* Controls */}
-            <div className="bg-white border-t p-4">
-                <div className="max-w-3xl mx-auto flex items-center justify-center gap-4">
-                    <TooltipProvider>
-                        <Tooltip>
-                            <TooltipTrigger asChild>
-                                <Button
-                                    variant={isMuted ? "destructive" : "secondary"}
-                                    size="icon"
-                                    className="rounded-full h-12 w-12"
-                                    onClick={toggleMute}
-                                >
-                                    {isMuted ? <MicOff /> : <Mic />}
-                                </Button>
-                            </TooltipTrigger>
-                            <TooltipContent>{isMuted ? "Unmute" : "Mute"}</TooltipContent>
-                        </Tooltip>
-                    </TooltipProvider>
-
-                    <TooltipProvider>
-                        <Tooltip>
-                            <TooltipTrigger asChild>
-                                <Button
-                                    variant={isVideoOff ? "destructive" : "secondary"}
-                                    size="icon"
-                                    className="rounded-full h-12 w-12"
-                                    onClick={toggleVideo}
-                                >
-                                    {isVideoOff ? <VideoOff /> : <Video />}
-                                </Button>
-                            </TooltipTrigger>
-                            <TooltipContent>{isVideoOff ? "Turn on camera" : "Turn off camera"}</TooltipContent>
-                        </Tooltip>
-                    </TooltipProvider>
-
-                    <TooltipProvider>
-                        <Tooltip>
-                            <TooltipTrigger asChild>
-                                <Button variant="destructive" size="icon" className="rounded-full h-14 w-14" onClick={endCall}>
-                                    <PhoneOff />
-                                </Button>
-                            </TooltipTrigger>
-                            <TooltipContent>End call</TooltipContent>
-                        </Tooltip>
-                    </TooltipProvider>
-                </div>
+            <div style={{ margin: "20px 0" }}>
+                <div>Status: {callStatus}</div>
+                <div>Call Time: {formatDuration(callDuration)}</div>
+            </div>
+            <div style={{ display: "flex", justifyContent: "center", gap: "10px" }}>
+                <button onClick={toggleMute} style={{ padding: "8px 16px" }}>
+                    {isMuted ? "Unmute" : "Mute"}
+                </button>
+                <button onClick={toggleVideo} style={{ padding: "8px 16px" }}>
+                    {isVideoOff ? "Turn On Video" : "Turn Off Video"}
+                </button>
+                <button
+                    onClick={endCall}
+                    style={{ padding: "8px 16px", backgroundColor: "red", color: "white" }}
+                >
+                    End Call
+                </button>
             </div>
         </div>
-    )
-}
+    );
+};
 
-export default VideoCall
+export default VideoCall;
