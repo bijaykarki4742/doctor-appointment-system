@@ -15,6 +15,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Calendar, Clock, FileText, DollarSign, Pill, Loader2 } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { toast } from "@/components/ui/use-toast";
+import { useUserRole} from "@/Contexts/UserContext.jsx";
 
 export function AppointmentsTable() {
     const [appointments, setAppointments] = useState([]);
@@ -29,11 +30,10 @@ export function AppointmentsTable() {
     const [rescheduleTime, setRescheduleTime] = useState("");
     const [isCancelling, setIsCancelling] = useState(false);
     const [isRescheduling, setIsRescheduling] = useState(false);
-    const [userRole, setUserRole] = useState("");
+    const { role , roleLoading} = useUserRole(null);
 
     // Fetch appointments
     useEffect(() => {
-        setUserRole("doctor");
         const fetchAppointments = async () => {
             try {
                 setLoading(true);
@@ -43,19 +43,43 @@ export function AppointmentsTable() {
                     throw new Error("Authentication token not found");
                 }
 
-                const response = await fetch("/api/appointments", {
+                // First fetch user info to get role and ID
+                const userInfoResponse = await fetch("http://localhost:3000/v1/api/users/me", {
                     headers: {
                         Authorization: `Bearer ${token}`,
                     },
                 });
 
-                if (!response.ok) {
+                if (!userInfoResponse.ok) {
+                    throw new Error("Failed to fetch user information");
+                }
+
+                const appointmentsResponse = await fetch("/api/appointments", {
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                    },
+                });
+
+                if (!appointmentsResponse.ok) {
                     throw new Error("Failed to fetch appointments");
                 }
 
-                const data = await response.json();
+                const userData = await userInfoResponse.json();
+                const appointmentsData = await appointmentsResponse.json();
 
-                const transformedData = data.map((appointment) => {
+                // Filter appointments based on role
+                let filteredAppointments = appointmentsData;
+                if (role === 'doctor') {
+                    filteredAppointments = appointmentsData.filter(
+                        app => app.doctorId._id === userData.profile._id
+                    );
+                } else if (role === 'patient') {
+                    filteredAppointments = appointmentsData.filter(
+                        app => app.patientId._id === userData.profile._id
+                    );
+                }
+
+                const transformedData = filteredAppointments.map((appointment) => {
                     const appointmentDate = new Date(appointment.date);
                     const formattedDate = appointmentDate.toLocaleDateString();
                     const time = `${appointment.timeSlot.start} - ${appointment.timeSlot.end}`;
@@ -78,7 +102,7 @@ export function AppointmentsTable() {
 
                     let action;
                     if (appointment.status === "scheduled") {
-                        action = "Start";
+                        action = role === 'doctor' ? "Start" : "Join";
                     } else {
                         action = "View";
                     }
@@ -86,8 +110,8 @@ export function AppointmentsTable() {
                     return {
                         id: appointment._id,
                         patientId: appointment.patientId,
-                        patientName: appointment.patientId?.firstName + " " + appointment.patientId?.lastName || "Patient Name",
-                        doctorName: appointment.doctorId?.firstName + " " + appointment.doctorId?.lastName || "Doctor Name",
+                        patientName: `${appointment.patientId.firstName} ${appointment.patientId.lastName}`,
+                        doctorName: `${appointment.doctorId.firstName} ${appointment.doctorId.lastName}`,
                         date: formattedDate,
                         time: time,
                         reason: appointment.reason,
@@ -116,7 +140,9 @@ export function AppointmentsTable() {
         };
 
         fetchAppointments();
-    }, []);
+    }, [activeTab, role]); // Add role to dependencies
+
+    if (roleLoading) return <p>Loading...</p>;
 
     // Filter appointments based on the active tab
     const filterAppointments = (appointmentsData, tab) => {
@@ -190,7 +216,7 @@ export function AppointmentsTable() {
         setSelectedAppointment(appointment);
 
         if (appointment.status === "Upcoming") {
-            if (userRole === "doctor") {
+            if (role === "doctor") {
                 try {
                     const token = localStorage.getItem("token");
                     const response = await fetch(`api/appointments/start-call/${appointment.id}`, {
@@ -215,7 +241,7 @@ export function AppointmentsTable() {
                         description: error.message,
                     });
                 }
-            } else if (userRole === "patient") {
+            } else if (role === "patient") {
                 try {
                     const token = localStorage.getItem("token");
                     const response = await fetch(`/api/appointments/get-room/${appointment.id}`, {
