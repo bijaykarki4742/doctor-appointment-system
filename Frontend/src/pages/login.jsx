@@ -6,12 +6,11 @@ import { useNavigate } from "react-router-dom"
 import { Checkbox } from "@/components/ui/checkbox"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Label } from "@/components/ui/label"
-import { AlertCircle, Mail, Lock, ArrowRight } from "lucide-react"
+import { AlertCircle, Mail, Lock, ArrowRight,Eye, EyeOff  } from "lucide-react"
 import { Alert, AlertDescription } from "@/components/ui/alert"
-// import Link from "next/link"
 import api from "../api/axios"
 import { useAuth } from "@/Contexts/AuthContext"
-import { useUserRole} from "@/Contexts/UserContext.jsx";
+import { useUserRole } from "@/Contexts/UserContext.jsx";
 
 const Login = () => {
   // Setup react-hook-form
@@ -25,7 +24,8 @@ const Login = () => {
 
   const [error, setError] = useState("")
   const [rememberMe, setRememberMe] = useState(false)
-  const {role, loading} = useUserRole();
+  const { role, loading } = useUserRole();
+  const [showPassword, setShowPassword] = useState(false);
 
   if (loading) return <p>Loading...</p>;
   // Function to handle form submission
@@ -114,18 +114,29 @@ const Login = () => {
                       Password
                     </Label>
                     {/* <Link href="/forgot-password" className="text-sm text-teal-600 hover:text-teal-700 hover:underline">
-                      Forgot password?
-                    </Link> */}
+      Forgot password?
+    </Link> */}
                   </div>
                   <div className="relative">
                     <Lock className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
                     <Input
                       {...register("password", { required: "Password is required" })}
                       id="password"
-                      type="password"
+                      type={showPassword ? "text" : "password"}
                       placeholder="••••••••"
-                      className={`pl-10 ${errors.password ? "border-red-500" : ""} transition-all duration-300 hover:border-teal-400 focus:border-teal-500`}
+                      className={`pl-10 pr-10 ${errors.password ? "border-red-500" : ""} transition-all duration-300 hover:border-teal-400 focus:border-teal-500`}
                     />
+                    <button
+                      type="button"
+                      className="absolute right-3 top-3 text-gray-400 hover:text-gray-600"
+                      onClick={() => setShowPassword(!showPassword)}
+                    >
+                      {showPassword ? (
+                        <EyeOff className="h-4 w-4" />
+                      ) : (
+                        <Eye className="h-4 w-4" />
+                      )}
+                    </button>
                   </div>
                   {errors.password && <p className="text-red-500 text-sm mt-1">{errors.password.message}</p>}
                 </div>
