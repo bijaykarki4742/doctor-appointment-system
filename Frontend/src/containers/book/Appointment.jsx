@@ -21,6 +21,7 @@ export function Appointment({ doctor }) {
     const [userprofileData, setUserProfileData] = useState(null);
     const [paymentCompleted, setPaymentCompleted] = useState(false);
     const [formData, setFormData] = useState(null);
+    const [appointmentId, setAppointmentId] = useState(null);
 
     const { register, handleSubmit, watch, formState: { errors }, reset } = useForm();
 
@@ -77,89 +78,6 @@ export function Appointment({ doctor }) {
     const handleConfirm = async (formData) => {
         setFormData(formData);
         setStep(3);
-
-        // try {
-        //     const token = localStorage.getItem("token");
-        //     if (!token) {
-        //         throw new Error("No authentication token found");
-        //     }
-
-        //     if (!userData?._id) throw new Error("User data not loaded. Please refresh the page");
-        //     if (!doctor?.id) throw new Error("No doctor selected. Please select a doctor");
-        //     if (!date) throw new Error("Please select an appointment date");
-        //     if (!timeSlot) throw new Error("Please select a time slot");
-        //     if (!formData.reason) throw new Error("Please specify the reason for your visit");
-
-        //     const selectedDate = new Date(date);
-        //     const now = new Date();
-
-        //     // Check if selected date is today
-        //     const isToday = selectedDate.toDateString() === now.toDateString();
-
-        //     if (isToday) {
-        //         // Parse the selected time slot (assuming format like "09:00 AM")
-        //         const [time, period] = timeSlot.start.split(' ');
-        //         let [hours, minutes] = time.split(':').map(Number);
-
-        //         // Convert to 24-hour format
-        //         if (period === 'PM' && hours !== 12) hours += 12;
-        //         if (period === 'AM' && hours === 12) hours = 0;
-
-        //         // Create Date object for the selected time
-        //         const selectedDateTime = new Date(selectedDate);
-        //         selectedDateTime.setHours(hours, minutes, 0, 0);
-
-        //         // Compare with current time
-        //         if (selectedDateTime < now) {
-        //             throw new Error("Cannot book appointments in the past. The selected time slot has already passed.");
-        //         }
-        //     }
-
-        //     // Populate data for appointment
-        //     const appointmentData = {
-        //         userId: userData._id,
-        //         doctorId: doctor.id,
-        //         date: format(date, "yyyy-MM-dd"),
-        //         timeSlot: {
-        //             start: timeSlot.start,
-        //             end: timeSlot.end
-        //         },
-        //         reason: formData.reason
-        //     };
-
-        //     const response = await api.post("/appointments/", appointmentData, {
-        //         headers: { Authorization: `Bearer ${token}` }
-        //     });
-
-        //     // Dismiss loading and show success
-        //     toast.dismiss(loadingToast);
-        //     toast.success('Appointment booked successfully!', {
-        //         duration: 4000,
-        //         position: 'top-center',
-        //     });
-
-        //     handleNext();
-        // } catch (error) {
-        //     console.log("Booking failed:", error);
-
-        //     // Dismiss loading and show error
-        //     toast.dismiss(loadingToast);
-
-        //     let errorMessage = 'Failed to book appointment';
-        //     if (error.response?.data?.error) {
-        //         errorMessage = error.response.data.error || error.response.data?.message || 'Server error occurred';;
-        //     } else if (error.request) {
-        //         errorMessage = 'Network error - please check your connection';
-        //     }
-        //     else if (error.message) {
-        //         errorMessage = error.message;
-        //     }
-
-        //     toast.error(errorMessage, {
-        //         duration: 5000,
-        //         position: 'top-center',
-        //     });
-        // }
     };
 
     // Add a new function for successful payment
@@ -200,6 +118,14 @@ export function Appointment({ doctor }) {
             const response = await api.post("/appointments/", appointmentData, {
                 headers: { Authorization: `Bearer ${token}` }
             });
+
+            // Store the appointment ID from the response
+            if (!response.data._id && !response.data.id) {
+                throw new Error("Appointment ID not received from server");
+            }
+
+            // Store the appointment ID from the response
+            setAppointmentId(response.data._id);
 
             toast.dismiss(loadingToast);
             toast.success('Appointment confirmed!', {
@@ -440,6 +366,7 @@ export function Appointment({ doctor }) {
                         reason: watch('reason') // From react-hook-form
                     }}
                     onBookAnother={handleBookAnother}
+                    appointmentId={appointmentId} // Pass appointment
                 />
             )}
         </div>

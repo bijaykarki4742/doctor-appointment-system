@@ -4,10 +4,15 @@ import { Review } from '../../models/Services/review.model.js';
 
 export const createReview = async (req, res) => {
     try {
-        const {appointmentId, rating, comment } = req.body;
-       
-        console.log(appointmentId)
+        const { appointmentId, rating, comment } = req.body;
 
+        const userId = req.user._id;
+
+        // Find patient by userId
+        const patient = await mongoose.model('Patient').findOne({ user: userId });
+        if (!patient) return res.status(404).json({ error: 'Patient not found' });
+
+        const patientId = patient._id;
         // Verify the appointment exists and belongs to this patient
         const appointment = await Appointment.findById(appointmentId);
 
@@ -19,9 +24,9 @@ export const createReview = async (req, res) => {
             return res.status(403).json({ success: false, message: 'Not authorized to review this appointment' });
         }
 
-        if (appointment.status !== 'completed') {
-            return res.status(400).json({ success: false, message: 'Can only review completed appointments' });
-        }
+        // if (appointment.status !== 'completed') {
+        //     return res.status(400).json({ success: false, message: 'Can only review completed appointments' });
+        // }
 
         const newReview = new Review({
             patientId,
