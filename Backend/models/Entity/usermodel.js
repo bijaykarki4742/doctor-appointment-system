@@ -20,19 +20,30 @@ const userSchema = new mongoose.Schema({
   password: {
     type: String,
     required: true,
-    minlength: [8,"Password must be at least 8 characters"],
+    minlength: [8, "Password must be at least 8 characters"],
     select: false // Never return password in queries
   },
   role: {
     type: String,
-    enum: ["patient", "doctor","admin"],
+    enum: ["patient", "doctor", "admin"],
     required: true,
-    default:"patient"
+    default: "patient"
   },
   isSuperAdmin: {  // Flag for full-access admins
     type: Boolean,
     default: false
   },
+
+  // ➕ Add these fields for OTP
+  otp: {
+    type: String,
+    default: null
+  },
+  otpExpire: {
+    type: Date,
+    default: null
+  },
+
   refreshToken: { type: String } // For JWT rotation
 }, { timestamps: true });
 
@@ -48,4 +59,6 @@ userSchema.methods.comparePassword = async function (candidatePassword) {
   return await bcrypt.compare(candidatePassword, this.password);
 };
 
-export const User = mongoose.model("User", userSchema);
+const User = mongoose.model('User', userSchema);
+
+export default User;

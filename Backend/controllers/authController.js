@@ -1,5 +1,5 @@
 import jwt from 'jsonwebtoken';
-import { User } from '../models/Entity/usermodel.js';
+import  User  from '../models/Entity/usermodel.js';
 import { Patient } from '../models/Entity/patient.model.js';
 import { Doctor } from '../models/Entity/doctor.model.js';
 
