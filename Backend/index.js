@@ -1,10 +1,13 @@
-// index.js
 import express from 'express';
 import { createServer } from 'http';
-import connectDB from './config/database.js';
 import cors from 'cors';
+import dotenv from 'dotenv';
 import router from './routes/indexRoute.js';
+import authRoutes from './routes/authRoutes.js';
+import connectDB from './config/database.js';
 import { setupSocket } from './Socket.js';
+
+dotenv.config();
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -17,6 +20,7 @@ app.use(cors({
 app.use(express.json());
 
 // Routes
+app.use('/api/auth', authRoutes);
 app.use('/', router);
 
 // Create HTTP server
@@ -25,7 +29,7 @@ const httpServer = createServer(app);
 // Setup Socket.IO
 setupSocket(httpServer);
 
-// Connect to database and start server
+// ✅ Use only this for DB connection
 connectDB()
     .then(() => {
         httpServer.listen(PORT, () => {
