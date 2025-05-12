@@ -17,6 +17,8 @@ import { Outlet } from "react-router-dom"
 import VideoCall from "@/containers/VideoCall.jsx";
 import {UserProvider} from "@/Contexts/UserContext.jsx";
 import ProtectedRoute from "@/containers/ProtectedRoute.jsx";
+import DoctorsPage from "@/containers/dashboard/doctors.jsx";
+import DoctorAppointmentStats from "@/containers/dashboard/barChart.jsx";
 
 function App() {
     return (
@@ -33,6 +35,7 @@ function App() {
                     <Route path="/Userprofile" element={<ProfileSettings />} />
                     <Route path="/bookDoctor" element={<BookDoctor />} />
                     <Route path="/dashboard" element={<Dashboard />} />
+                    <Route path="/stats" element={<DoctorAppointmentStats />} />
                     <Route path="/videoCall/:roomId" element={<VideoCall />} />
 
 
@@ -43,6 +46,7 @@ function App() {
                         <Route path="Userprofile" element={ <ProfileSettings />} />
                         <Route path="patients" element={ <ProtectedRoute allowedRoles={['admin', 'doctor']}><PatientsPage /> </ProtectedRoute>} />
                         <Route path="dashboard" element={<Dashboard />} />
+                        <Route path="doctors" element={<DoctorsPage />} />
                     </Route>
                 </Routes>
             </UserProvider>
