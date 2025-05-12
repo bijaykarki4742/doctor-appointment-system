@@ -38,6 +38,7 @@
     "react-day-picker": "^8.10.1",
     "react-dom": "^19.0.0",
     "react-hook-form": "^7.55.0",
+    "react-hot-toast": "^2.5.2",
     "react-intersection-observer": "^9.16.0",
     "react-router-dom": "^7.4.0",
     "recharts": "^2.15.3",

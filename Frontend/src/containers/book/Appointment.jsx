@@ -10,7 +10,8 @@ import { format } from "date-fns"
 import { AppointmentConfirmation } from "./AppointmentConfirmation"
 import { useForm } from "react-hook-form"
 import api from "@/api/axios"
-
+import toast from "react-hot-toast"
+import { PaymentStep } from "./PaymentStep"
 
 export function Appointment({ doctor }) {
     const [step, setStep] = useState(1);
@@ -18,6 +19,9 @@ export function Appointment({ doctor }) {
     const [timeSlot, setTimeSlot] = useState(null);
     const [userData, setUserData] = useState(null);
     const [userprofileData, setUserProfileData] = useState(null);
+    const [paymentCompleted, setPaymentCompleted] = useState(false);
+    const [formData, setFormData] = useState(null);
+    const [appointmentId, setAppointmentId] = useState(null);
 
     const { register, handleSubmit, watch, formState: { errors }, reset } = useForm();
 
@@ -36,9 +40,6 @@ export function Appointment({ doctor }) {
                 if (!response.data.user) {
                     throw new Error("User data not found in response");
                 }
-
-                // console.log("user response data :", response.data.user);
-                // console.log("user profile response data :", response.data.profile);
 
                 setUserData(response.data.user);
                 setUserProfileData(response.data.profile);
@@ -75,20 +76,32 @@ export function Appointment({ doctor }) {
     };
 
     const handleConfirm = async (formData) => {
+        setFormData(formData);
+        setStep(3);
+    };
+
+    // Add a new function for successful payment
+    const handlePaymentSuccess = async () => {
+        setPaymentCompleted(true);
+
+        // Show loading toast
+        const loadingToast = toast.loading('Confirming your appointment...');
+
         try {
             const token = localStorage.getItem("token");
-            if (!token) {
-                throw new Error("No authentication token found");
-            }
-            console.log("user data ;", userData);
-            console.log("Doctor ;", doctor);
+            if (!token) throw new Error("No authentication token found");
 
             if (!userData?._id) throw new Error("User data not loaded");
             if (!doctor?.id) throw new Error("No doctor selected");
             if (!date) throw new Error("No date selected");
             if (!timeSlot) throw new Error("No time slot selected");
+            if (!formData?.reason) throw new Error("No reason specified");
 
-            // Populate data for appointment
+            // Validate date/time (same as before)
+            const selectedDate = new Date(date);
+            const now = new Date();
+            // ... (same validation logic as before)
+
             const appointmentData = {
                 userId: userData._id,
                 doctorId: doctor.id,
@@ -97,19 +110,37 @@ export function Appointment({ doctor }) {
                     start: timeSlot.start,
                     end: timeSlot.end
                 },
-                reason: formData.reason
+                reason: formData.reason,
+                paymentStatus: "paid", // Add payment status
+                paymentMethod: "esewa" // Add payment method
             };
-
-            console.log("Submitting appointment:", appointmentData);
 
             const response = await api.post("/appointments/", appointmentData, {
                 headers: { Authorization: `Bearer ${token}` }
             });
 
-            console.log("Appointment created:", response.data);
-            handleNext();
+            // Store the appointment ID from the response
+            if (!response.data._id && !response.data.id) {
+                throw new Error("Appointment ID not received from server");
+            }
+
+            // Store the appointment ID from the response
+            setAppointmentId(response.data._id);
+
+            toast.dismiss(loadingToast);
+            toast.success('Appointment confirmed!', {
+                duration: 4000,
+                position: 'top-center',
+            });
+
+            setStep(4); // Move to confirmation step
         } catch (error) {
-            console.log("Booking failed:", error);
+            console.error("Error confirming appointment:", error);
+            toast.dismiss(loadingToast);
+            toast.error('Failed to confirm appointment. Please try again.', {
+                duration: 4000,
+                position: 'top-center',
+            });
         }
     };
 
@@ -126,10 +157,10 @@ export function Appointment({ doctor }) {
             {/* Progress Indicator */}
             <div className="flex justify-center">
                 <div className="flex items-center space-x-2">
-                    {[1, 2, 3].map((s) => (
+                    {[1, 2, 3, 4].map((s) => (
                         <div key={s} className="flex items-center">
-                            <div
-                                className={cn(
+                            <div className={
+                                cn(
                                     "h-8 w-8 rounded-full flex items-center justify-center text-sm font-medium",
                                     step === s
                                         ? "bg-teal-600 text-white"
@@ -140,7 +171,7 @@ export function Appointment({ doctor }) {
                             >
                                 {s}
                             </div>
-                            {s < 3 && (
+                            {s < 4 && (
                                 <div className={cn("h-1 w-10", step > s ? "bg-teal-600" : "bg-gray-200")} />
                             )}
                         </div>
@@ -307,8 +338,25 @@ export function Appointment({ doctor }) {
                 </Card>
             )}
 
-            {/* Step 3: Confirmation */}
+            {/* Step 3: Payment */}
             {step === 3 && (
+                <PaymentStep
+                    doctor={doctor}
+                    date={date}
+                    timeSlot={timeSlot}
+                    patientInfo={{
+                        name: `${userprofileData.firstName} ${userprofileData.lastName}`,
+                        email: userData.email,
+                        phone: userprofileData.contact,
+                        reason: watch('reason')
+                    }}
+                    onPaymentSuccess={handlePaymentSuccess}
+                    onBack={handleBack}
+                />
+            )}
+
+            {/* Step 4: Confirmation */}
+            {step === 4 && (
                 <AppointmentConfirmation
                     doctor={{
                         name: doctor.name,
@@ -323,10 +371,9 @@ export function Appointment({ doctor }) {
                         reason: watch('reason') // From react-hook-form
                     }}
                     onBookAnother={handleBookAnother}
+                    appointmentId={appointmentId} // Pass appointment
                 />
             )}
-
-            {/* <AppointmentCompleted  ></AppointmentCompleted> */}
         </div>
     );
 }

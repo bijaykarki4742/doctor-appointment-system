@@ -1,7 +1,8 @@
 import {
   LayoutDashboard,
   Users,
-  Settings, Calendar, MessageSquare, BarChart3
+  Settings, Calendar, MessageSquare, BarChart3,
+  Check
 } from "lucide-react"
 import {
   Sidebar,
@@ -23,10 +24,11 @@ export function AppSidebar({ ...props }) {
     { icon: Calendar, label: "Appointments", path: "/admin/appointments" },
     // Only show these if role is 'admin'
     ...(role === "admin"
-        ? [
-          { icon: Users, label: "Patients", path: "/admin/patients" },
-        ]
-        : []),
+      ? [
+        { icon: Users, label: "Patients", path: "/admin/patients" },
+        { icon: Check, label: "Verify Doctors", path: "/admin/verifyDoctors" },
+      ]
+      : []),
     { icon: BarChart3, label: "Profile", path: "/Userprofile" },
     { icon: Settings, label: "Settings", path: "/settings" },
   ];
@@ -49,27 +51,25 @@ export function AppSidebar({ ...props }) {
           </SidebarMenuItem>
         </SidebarMenu>
       </SidebarHeader>
-      
+
       <SidebarContent className="px-3 py-4">
         <SidebarMenu>
           {menuItems.map((item) => {
-            const isActive = location.pathname === item.path || 
-                           (item.path !== "/" && location.pathname.startsWith(item.path))
+            const isActive = location.pathname === item.path ||
+              (item.path !== "/" && location.pathname.startsWith(item.path))
             return (
               <SidebarMenuItem key={item.label} className="mb-1">
-                <SidebarMenuButton 
+                <SidebarMenuButton
                   asChild
                   variant={isActive ? "secondary" : "ghost"}
-                  className={`w-full justify-start rounded-lg transition-all ${
-                    isActive 
-                      ? "bg-teal-50 text-teal-700 hover:bg-teal-100 font-medium" 
+                  className={`w-full justify-start rounded-lg transition-all ${isActive
+                      ? "bg-teal-50 text-teal-700 hover:bg-teal-100 font-medium"
                       : "hover:bg-gray-100 text-gray-700"
-                  }`}
+                    }`}
                 >
                   <Link to={item.path} className="flex items-center py-3 px-3">
-                    <item.icon className={`mr-3 h-5 w-5 ${
-                      isActive ? "text-teal-600" : "text-gray-500"
-                    }`} />
+                    <item.icon className={`mr-3 h-5 w-5 ${isActive ? "text-teal-600" : "text-gray-500"
+                      }`} />
                     <span>{item.label}</span>
                     {isActive && (
                       <span className="ml-auto h-2 w-2 rounded-full bg-teal-600" />

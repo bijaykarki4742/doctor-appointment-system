@@ -18,10 +18,25 @@ export const createAppointment = async (req, res) => {
     // Check if patient and doctor exist
     const doctor = await mongoose.model('Doctor').findById(doctorId);
     if (!doctor) return res.status(404).json({ error: 'Doctor not found' });
-    
+
+    // Check for existing appointment with same doctor, date, and time slot
+    const existingAppointment = await Appointment.findOne({
+      patientId: patient._id,
+      doctorId,
+      date,
+      timeSlot,
+      status: { $ne: 'cancelled' } // exclude cancelled appointments
+    });
+
+    if (existingAppointment) {
+      return res.status(409).json({
+        error: 'You already have an appointment with this doctor at the selected time slot'
+      });
+    }
+
     // Create appointment
     const appointment = new Appointment({
-      patientId :patient._id,
+      patientId: patient._id,
       doctorId,
       date,
       timeSlot,
@@ -36,7 +51,7 @@ export const createAppointment = async (req, res) => {
     if (error.name === 'ValidationError') {
       return res.status(400).json({ error: error.message });
     }
-    res.status(500).json({ error: 'Server error' });
+    res.status(500).json({ error: 'Server error,Error in creating appointment' });
   }
 };
 
@@ -101,8 +116,8 @@ export const updateAppointment = async (req, res) => {
 
     // Prevent updating patientId or doctorId
     if (updates.patientId || updates.doctorId) {
-      return res.status(400).json({ 
-        error: 'Cannot change patient or doctor after creation' 
+      return res.status(400).json({
+        error: 'Cannot change patient or doctor after creation'
       });
     }
 
@@ -121,8 +136,8 @@ export const updateAppointment = async (req, res) => {
 
       // Validate the combined timeSlot
       if (fullTimeSlot.end <= fullTimeSlot.start) {
-        return res.status(400).json({ 
-          error: 'End time must be after start time' 
+        return res.status(400).json({
+          error: 'End time must be after start time'
         });
       }
 
@@ -134,8 +149,8 @@ export const updateAppointment = async (req, res) => {
     if (updates.date) {
       const date = new Date(updates.date);
       if (date < new Date().setHours(0, 0, 0, 0)) {
-        return res.status(400).json({ 
-          error: 'Appointment date cannot be in the past' 
+        return res.status(400).json({
+          error: 'Appointment date cannot be in the past'
         });
       }
     }
@@ -154,14 +169,14 @@ export const updateAppointment = async (req, res) => {
   } catch (error) {
     console.error('Update error:', error);
     if (error.name === 'ValidationError') {
-      return res.status(400).json({ 
+      return res.status(400).json({
         error: 'Validation error',
-        details: error.message 
+        details: error.message
       });
     }
-    res.status(500).json({ 
+    res.status(500).json({
       error: 'Server error',
-      details: error.message 
+      details: error.message
     });
   }
 };
@@ -225,7 +240,7 @@ export const addPrescription = async (req, res) => {
 
     const appointment = await Appointment.findByIdAndUpdate(
       id,
-      { 
+      {
         prescription: { medications, instructions },
         status: 'completed' // Automatically mark as completed when adding prescription
       },

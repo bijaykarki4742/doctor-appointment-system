@@ -50,7 +50,7 @@ export default function DoctorCard({ doctor }) {
                 <div className="p-5">
                     <div className="flex gap-4">
                         <Avatar className="h-20 w-20 border-2 border-blue-100 shadow-sm">
-                            <AvatarImage src={doctor.image} alt={doctor.name} />
+                            <AvatarImage src={doctor.image} alt={doctor.name}  className="object-cover w-full h-full" />
                             <AvatarFallback className="bg-blue-50 text-blue-600 font-semibold">
                                 {getInitials(doctor.name)}
                             </AvatarFallback>

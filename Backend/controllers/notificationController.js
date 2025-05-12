@@ -20,8 +20,6 @@ export const sendAppointmentNotification = async (req, res) => {
     // Send email notification
     await sendEmailNotification(appointmentDetails, patientInfo);
     
-    // Send SMS notification
-    await sendSMSNotification(appointmentDetails, patientInfo);
     
     res.status(200).json({ success: true, message: 'Notifications sent successfully' });
   } catch (error) {
@@ -49,16 +47,4 @@ async function sendEmailNotification(appointment, patient) {
     throw new Error('Failed to send email notification');
   });
   console.log('Email sent successfully to:', patient.email);
-}
-
-async function sendSMSNotification(appointment, patient) {
-  await twilioClient.messages.create({
-    from: process.env.TWILIO_PHONE_NUMBER,
-    to:'+9779817436885',
-    body: `Your Appointment has been confirmed with Dr. ${appointment.doctor.name} on ${appointment.date} at ${appointment.time}`,
-  }).catch((error) => {
-    console.error('SMS error:', error);
-    throw new Error('Failed to send SMS notification');
-  });
-  console.log('SMS sent successfully');
 }
