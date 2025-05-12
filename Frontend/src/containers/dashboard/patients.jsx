@@ -182,12 +182,12 @@ export default function PatientsPage() {
                               </span>
                                                         )}
                                                     </div>
-                                                    <span>{patient.name}</span>
+                                                    <span>{patient.firstName + " " + patient.lastName}</span>
                                                 </div>
                                             </TableCell>
                                             <TableCell>{patient.age}</TableCell>
                                             <TableCell>{patient.gender}</TableCell>
-                                            <TableCell>{patient.phone}</TableCell>
+                                            <TableCell>{patient.contact}</TableCell>
                                             <TableCell>
                                                 <Badge className={patient.status === 'active' ?
                                                     "bg-green-100 text-green-800 hover:bg-green-100" :

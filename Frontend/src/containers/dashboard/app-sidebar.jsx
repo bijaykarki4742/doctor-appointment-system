@@ -26,7 +26,6 @@ export function AppSidebar({ ...props }) {
     ...(role === "admin"
       ? [
         { icon: Users, label: "Patients", path: "/admin/patients" },
-        { icon: MessageSquare, label: "Doctors", path: "/Doctor" },
         { icon: Check, label: "Verify Doctors", path: "/admin/verifyDoctors" },
       ]
       : []),
@@ -44,9 +43,9 @@ export function AppSidebar({ ...props }) {
             <SidebarMenuButton size="lg" asChild className="hover:bg-transparent px-0">
               <Link to="/" className="flex items-center gap-3">
                 <div className="w-10 h-10 rounded-lg bg-teal-600 flex items-center justify-center">
-                  <span className="text-white font-bold text-lg">US</span>
+                  <span className="text-white font-bold text-lg">EC</span>
                 </div>
-                <span className="text-lg font-bold">UScreen</span>
+                <span className="text-lg font-bold">Easy Care</span>
               </Link>
             </SidebarMenuButton>
           </SidebarMenuItem>

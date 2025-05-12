@@ -16,6 +16,8 @@ import { DashboardLayout } from "@/pages/DashboardLayout.jsx"
 import VideoCall from "@/containers/VideoCall.jsx";
 import { UserProvider } from "@/Contexts/UserContext.jsx";
 import ProtectedRoute from "@/containers/ProtectedRoute.jsx";
+import DoctorsPage from "@/containers/dashboard/doctors.jsx";
+import DoctorAppointmentStats from "@/containers/dashboard/barChart.jsx";
 import { Toaster } from "react-hot-toast"
 import VerifyDoctors from "./containers/dashboard/VerifyDoctors"
 
@@ -72,7 +74,7 @@ function App() {
                         <Route path="patients" element={<ProtectedRoute allowedRoles={['admin', 'doctor']}><PatientsPage /> </ProtectedRoute>} />
                         <Route path="dashboard" element={<Dashboard />} />
                         <Route path="verifyDoctors" element={<VerifyDoctors />} />
-
+                        <Route path="doctors" element={<DoctorsPage />} />
                     </Route>
                 </Routes>
             </UserProvider>
