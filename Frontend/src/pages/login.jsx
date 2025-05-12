@@ -11,7 +11,7 @@ import { Alert, AlertDescription } from "@/components/ui/alert"
 // import Link from "next/link"
 import api from "../api/axios"
 import { useAuth } from "@/Contexts/AuthContext"
-
+import ForgotPasswordDialog from "@/containers/ForgotPassword/forgot-password-dialog"
 const Login = () => {
   // Setup react-hook-form
   const {
@@ -24,6 +24,7 @@ const Login = () => {
 
   const [error, setError] = useState("")
   const [rememberMe, setRememberMe] = useState(false)
+  const [forgotPasswordOpen, setForgotPasswordOpen] = useState(false)
 
   // Function to handle form submission
   const onSubmit = async (data) => {
@@ -39,6 +40,7 @@ const Login = () => {
     try {
       const response = await api.post("/auth/login", loginData)
 
+
       if (response.data.success) {
         login(response.data.token, {
           name: response.data.user.name,
@@ -51,7 +53,8 @@ const Login = () => {
     } catch (err) {
       const errorMessage = err.response?.data?.error || err.message || "An error occurred during login"
       setError(errorMessage)
-      console.error("Login error:", err.response?.data || err.message)
+       console.error("Login error:", err.response?.data || err.message)
+
     }
   }
 
@@ -108,9 +111,7 @@ const Login = () => {
                     <Label htmlFor="password" className="text-sm font-medium">
                       Password
                     </Label>
-                    {/* <Link href="/forgot-password" className="text-sm text-teal-600 hover:text-teal-700 hover:underline">
-                      Forgot password?
-                    </Link> */}
+                   
                   </div>
                   <div className="relative">
                     <Lock className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
@@ -125,15 +126,31 @@ const Login = () => {
                   {errors.password && <p className="text-red-500 text-sm mt-1">{errors.password.message}</p>}
                 </div>
 
-                <div className="flex items-center space-x-2">
-                  <Checkbox id="remember" checked={rememberMe} onCheckedChange={setRememberMe} />
-                  <label
-                    htmlFor="remember"
-                    className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-                  >
-                    Remember me
-                  </label>
-                </div>
+                <div className="flex items-center justify-between ">
+  <div className="flex items-center space-x-2">
+    <Checkbox id="remember" checked={rememberMe} onCheckedChange={setRememberMe} />
+    <label
+      htmlFor="remember"
+      className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+    >
+      Remember me
+    </label>
+  </div>
+  <Button
+                variant="link"
+                className="p-0 h-auto"
+                onClick={(e) => {
+                  e.preventDefault()
+                  setForgotPasswordOpen(true)
+                }}
+              >
+                Forgot password?
+  {/* <a href="/forgot-password" className="text-sm text-teal-600 hover:text-teal-700 hover:underline">
+    Forgot password?
+  </a> */}
+              </Button>
+</div>
+
 
                 <Button
                   type="submit"
@@ -181,6 +198,7 @@ const Login = () => {
               </p>
             </CardFooter> */}
           </Card>
+          <ForgotPasswordDialog open={forgotPasswordOpen} onOpenChange={setForgotPasswordOpen} />
         </div>
       </div>
 
@@ -224,6 +242,8 @@ const Login = () => {
         </div>
       </div>
     </div>
+    
   )
 }
+
 export default Login;
