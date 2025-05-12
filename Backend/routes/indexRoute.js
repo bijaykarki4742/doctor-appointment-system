@@ -7,6 +7,7 @@ import { getCurrentUserProfile } from "../controllers/userController.js";
 import appointmentRouter from "./appointmentRoutes.js";
 import reviewRouter from "./reviewRoutes.js";
 import notificationRouter from "./notificationRoute.js";
+import verificationRouter from "./verificationRouter.js";
 
 const router = Router();
 
@@ -20,7 +21,7 @@ router.get('/', (req, res) => {
             doctors: "/v1/api/doctors",
             admin: "/admin",
             appointment: "/v1/api/appointments",
-            review: "/v1/api/reviews",
+            review: "/v1/api/review",
             sendnotification: "/v1/api/sendNotification"
         }
     });
@@ -33,6 +34,8 @@ router.use('/v1/api/users',userRoutes);
 router.use('/v1/api/appointments',appointmentRouter)
 router.use('/v1/api/review',reviewRouter)
 router.use('/v1/api/sendNotification',notificationRouter );
+router.use('/v1/api/verification',verificationRouter);
+// router.use('/v1/api/payments',payemntRouter );
 
 
 export default router;

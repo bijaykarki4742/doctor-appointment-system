@@ -1,10 +1,15 @@
-// index.js
 import express from 'express';
 import { createServer } from 'http';
-import connectDB from './config/database.js';
+import { fileURLToPath } from 'url';
+import { dirname, join } from 'path';
+import fs from 'fs';
 import cors from 'cors';
+import connectDB from './config/database.js';
 import router from './routes/indexRoute.js';
 import { setupSocket } from './Socket.js';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
 
 const app = express();
 const PORT = process.env.PORT || 3000;

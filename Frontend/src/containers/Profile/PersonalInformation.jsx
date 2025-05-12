@@ -10,21 +10,21 @@ import { Button } from "@/components/ui/button";
 import { cn } from "@/components/lib/utils";
 
 export default function PersonalInformation({
-                                                data,
-                                                userType,
-                                                isEditing,
-                                                handleChange,
-                                                handleSelectChange,
-                                                date,
-                                                handleDateChange,
-                                                setData,
-                                            }) {
+    data,
+    userType,
+    isEditing,
+    handleChange,
+    handleSelectChange,
+    date,
+    handleDateChange,
+    setData,
+}) {
     return (
-        <Card className="bg-white shadow-lg rounded-lg overflow-hidden mb-8">
-            <CardHeader className="bg-blue-500 text-white p-4">
+        <Card className="bg-white shadow-lg rounded-lg border-gray-300  overflow-hidden mb-8">
+            <CardHeader className="bg-teal-500 text-white p-4">
                 <CardTitle className="text-2xl font-bold">Personal Information</CardTitle>
             </CardHeader>
-            <CardContent className="p-6 space-y-6">
+            <CardContent className="p-6 space-y-4">
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div className="space-y-2">
                         <Label htmlFor="firstName" className="text-gray-600 font-medium">First Name</Label>

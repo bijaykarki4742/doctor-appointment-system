@@ -216,13 +216,13 @@ export default function DoctorList() {
                 </div>
 
                 {/* Search and Filters */}
-                <div className="bg-white p-4 md:p-6 rounded-lg shadow-sm mb-6">
-                    <div className="flex flex-col space-y-4 md:flex-row md:space-y-0 md:space-x-4">
+                <div className="bg-white p-4 md:p-6 rounded-lg shadow-sm mb-2">
+                    <div className="flex flex-col space-y-4 md:flex-row md:space-y-0 md:space-x-4 mb-2">
                         <div className="relative flex-grow">
                             <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
                             <Input
                                 placeholder="Search by name, specialty, or location..."
-                                className="pl-10 bg-gray-50 border-gray-200 focus-visible:ring-primary"
+                                className=" pt-2 pb-2 pl-10 bg-gray-50 border-gray-400 focus-visible:ring-primary"
                                 value={searchQuery}
                                 onChange={(e) => setSearchQuery(e.target.value)}
                             />

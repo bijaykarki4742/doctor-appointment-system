@@ -1,8 +1,5 @@
-"use client"
-
 import { useEffect, useState } from "react"
 import { Button } from "@/components/ui/button"
-import { useToast, toast} from "@/components/ui/use-toast.js"
 import api from "@/api/axios.js"
 import ProfileHeader from "@/containers/Profile/ProfileHeader"
 import PersonalInformation from "@/containers/Profile/PersonalInformation"
@@ -10,6 +7,9 @@ import ProfessionalInformation from "@/containers/Profile/ProfessionalInformatio
 import MedicalInformation from "@/containers/Profile/MedicalInformation"
 import UpcomingAppointment from "@/containers/Profile/UpcomingAppointment"
 import { Settings } from "lucide-react"
+import toast from "react-hot-toast"
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { set } from "date-fns"
 
 export default function ProfileSettings() {
     const [userType, setUserType] = useState(null)
@@ -20,7 +20,7 @@ export default function ProfileSettings() {
     const [loading, setLoading] = useState(true)
     const [saving, setSaving] = useState(false)
     const [error, setError] = useState("")
-    const { toast } = useToast()
+    const [doctorId, setDoctorId] = useState(null)
 
     useEffect(() => {
         fetchUserData()
@@ -35,13 +35,14 @@ export default function ProfileSettings() {
             const response = await api.get(`/users/me`, {
                 headers: { Authorization: `Bearer ${token}` },
             })
-            console.log(response);
+            // console.log(response);
 
             const userRole = response.data.user?.role
             const profileData = response.data.profile
+            setDoctorId(response.data.user?._id)
 
             setProfileId(profileData._id)
-            console.log(profileId)
+            // console.log(profileId)
             if (userRole === "patient") {
                 setData({
                     firstName: profileData.firstName || "",
@@ -81,12 +82,8 @@ export default function ProfileSettings() {
             setError("")
         } catch (error) {
             console.error("Failed to fetch profile", error)
-            setError(error.message || "Failed to fetch profile")
-            toast({
-                title: "Error",
-                description: "Failed to load profile data. Please try again.",
-                variant: "destructive",
-            })
+            // setError(error.message || "Failed to fetch profile")
+            toast.error("Failed to load profile data. Please try again.")
         } finally {
             setLoading(false)
         }
@@ -114,8 +111,12 @@ export default function ProfileSettings() {
             setSaving(true)
 
             const token = localStorage.getItem("token")
-            if (!token) throw new Error("No authentication token found")
-            if (!profileId) throw new Error("Profile ID not found. Please refresh the page.")
+            if (!token) {
+                toast.error("No authentication,Please login to access this page")
+            }
+            if (!profileId) {
+                toast.error("Profile ID not found. Please refresh the page.")
+            }
 
             let updateData = {}
             let endpoint = ""
@@ -153,6 +154,7 @@ export default function ProfileSettings() {
                 }
                 endpoint = `/users/update/${profileId}`
             } else {
+                toast.error(" Invalid role ID.")
                 throw new Error("Invalid role")
             }
 
@@ -162,10 +164,7 @@ export default function ProfileSettings() {
 
             const success = response.data.doctor || response.data.profile || response.data.patient
             if (success) {
-                toast({
-                    title: "Success",
-                    description: "Profile updated successfully",
-                })
+                toast.success("Profile updated successfully")
                 console.log("Saving this data:", data)
                 await fetchUserData()
             } else {
@@ -182,7 +181,6 @@ export default function ProfileSettings() {
             setIsEditing(false)
         }
     }
-
 
     const handleChange = (e) => {
         const { name, value } = e.target
@@ -224,51 +222,65 @@ export default function ProfileSettings() {
             </div>
         )
     }
-
     return (
-        <div className="container mx-auto py-6 max-w-4xl">
-            <div className="flex items-center justify-between mb-6">
-                <h1 className="text-2xl font-bold">Profile Settings</h1>
-                <Button variant="ghost" size="icon">
+        <div className="container m-auto p-6 ">
+            <div className="flex justify-between items-center mb-4">
+                <h1 className="text-2xl font-bold text-gray-900">Profile Settings</h1>
+                <Button variant="ghost" size="icon" className="text-gray-500 hover:text-gray-700">
                     <Settings className="h-5 w-5" />
                 </Button>
             </div>
 
-            <ProfileHeader data={data} userType={userType} isEditing={isEditing} toggleEditMode={() => setIsEditing(!isEditing)} />
+            {/* Main Content Area */}
+            <div className="flex flex-col lg:flex-row gap-8">
+                {/* Left Column - Profile Card  */}
+                <div className="lg:w-1/4">
+                    <ProfileHeader
+                        data={data}
+                        userType={userType}
+                        isEditing={isEditing}
+                        toggleEditMode={() => setIsEditing(!isEditing)}
+                        doctorId={profileId}
+                    />
+                </div>
 
-            <PersonalInformation
-                data={data}
-                userType={userType}
-                isEditing={isEditing}
-                handleChange={handleChange}
-                handleSelectChange={handleSelectChange}
-                date={date}
-                handleDateChange={handleDateChange}
-                setData={setData}
-            />
+                {/* Right Column - Forms  */}
+                <div className="lg:w-3/4 h-[calc(100vh-180px)] lg:h-[calc(100vh-180px)] overflow-y-auto pr-2">
+                    {/* Personal Information */}
+                    <PersonalInformation
+                        data={data}
+                        userType={userType}
+                        isEditing={isEditing}
+                        handleChange={handleChange}
+                        handleSelectChange={handleSelectChange}
+                        date={date}
+                        handleDateChange={handleDateChange}
+                        setData={setData}
+                    />
 
-            {userType === "doctor" ? (
-                <ProfessionalInformation
-                    data={data}
-                    isEditing={isEditing}
-                    handleChange={handleChange}
-                    handleSelectChange={handleSelectChange}
-                    handleSave={handleSave}
-                    saving={saving}
-                    setIsEditing={setIsEditing}
-                />
-            ) : (
-                <MedicalInformation
-                    data={data}
-                    isEditing={isEditing}
-                    handleChange={handleChange}
-                    handleSave={handleSave}
-                    saving={saving}
-                    setIsEditing={setIsEditing}
-                />
-            )}
-
-            {/*{userType === "patient" && <UpcomingAppointment />}*/}
+                    {/* Professional/Medical Information */}
+                    {userType === "doctor" ? (
+                        <ProfessionalInformation
+                            data={data}
+                            isEditing={isEditing}
+                            handleChange={handleChange}
+                            handleSelectChange={handleSelectChange}
+                            handleSave={handleSave}
+                            saving={saving}
+                            setIsEditing={setIsEditing}
+                        />
+                    ) : (
+                        <MedicalInformation
+                            data={data}
+                            isEditing={isEditing}
+                            handleChange={handleChange}
+                            handleSave={handleSave}
+                            saving={saving}
+                            setIsEditing={setIsEditing}
+                        />
+                    )}
+                </div>
+            </div>
         </div>
     )
 }
