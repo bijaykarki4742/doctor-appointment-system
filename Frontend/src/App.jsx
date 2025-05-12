@@ -17,6 +17,7 @@ import VideoCall from "@/containers/VideoCall.jsx";
 import { UserProvider } from "@/Contexts/UserContext.jsx";
 import ProtectedRoute from "@/containers/ProtectedRoute.jsx";
 import { Toaster } from "react-hot-toast"
+import VerifyDoctors from "./containers/dashboard/VerifyDoctors"
 
 function App() {
     return (
@@ -70,6 +71,8 @@ function App() {
                         <Route path="Userprofile" element={<ProfileSettings />} />
                         <Route path="patients" element={<ProtectedRoute allowedRoles={['admin', 'doctor']}><PatientsPage /> </ProtectedRoute>} />
                         <Route path="dashboard" element={<Dashboard />} />
+                        <Route path="verifyDoctors" element={<VerifyDoctors />} />
+
                     </Route>
                 </Routes>
             </UserProvider>

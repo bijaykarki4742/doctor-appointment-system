@@ -6,17 +6,17 @@ import { Button } from "@/components/ui/button"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 
 export default function ProfessionalInformation({
-                                                    data,
-                                                    isEditing,
-                                                    handleChange,
-                                                    handleSelectChange,
-                                                    handleSave,
-                                                    saving,
-                                                    setIsEditing,
-                                                }) {
+    data,
+    isEditing,
+    handleChange,
+    handleSelectChange,
+    handleSave,
+    saving,
+    setIsEditing,
+}) {
     return (
-        <Card className="bg-white shadow-lg rounded-lg overflow-hidden mb-8">
-            <CardHeader className="bg-blue-500 text-white p-4">
+        <Card className="bg-white shadow-lg rounded-lg border-gray-300  overflow-hidden mb-8">
+            <CardHeader className="bg-teal-500 text-white p-4">
                 <CardTitle className="text-2xl font-bold">Professional Information</CardTitle>
             </CardHeader>
             <CardContent className="p-6 space-y-6">
@@ -194,7 +194,7 @@ export default function ProfessionalInformation({
                     <Button
                         onClick={handleSave}
                         disabled={saving}
-                        className="bg-blue-500 text-white hover:bg-blue-600"
+                        className="bg-teal-500 text-white hover:bg-teal-600"
                     >
                         {saving ? (
                             <>

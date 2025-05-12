@@ -135,7 +135,12 @@ export function Appointment({ doctor }) {
 
             setStep(4); // Move to confirmation step
         } catch (error) {
-            // ... (same error handling as before)
+            console.error("Error confirming appointment:", error);
+            toast.dismiss(loadingToast);
+            toast.error('Failed to confirm appointment. Please try again.', {
+                duration: 4000,
+                position: 'top-center',
+            });
         }
     };
 
