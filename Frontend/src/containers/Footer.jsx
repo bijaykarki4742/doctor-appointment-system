@@ -59,7 +59,7 @@ export default function Footer() {
 
                     {/* Contact Us Section */}
                     <div>
-                        <h2 className="text-xl font-bold mb-4">Contact Us</h2>
+                        <h2 className="text-xl font-bold mb-4" href="">Contact Us</h2>
                         <div className="space-y-2">
                             <div className="flex items-center gap-2">
                                 <Phone className="h-4 w-4" />
@@ -80,3 +80,6 @@ export default function Footer() {
         </footer>
     );
 }
+
+
+
