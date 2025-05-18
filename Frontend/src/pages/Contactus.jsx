@@ -4,11 +4,11 @@ import Footer from "@/containers/Footer.jsx";
 import Navbar from "@/containers/Navbar.jsx";
 import React from "react";
 
-
 function Contactus() {
     return (
         <div className="min-h-screen flex flex-col">
-            <Navbar></Navbar>
+            <Navbar />
+
             <main className="flex-grow container my-12 mx-auto px-4 py-12">
                 <h1 className="text-4xl font-bold text-center mb-12">Get in Touch</h1>
                 <p className="text-center text-gray-600 max-w-2xl mx-auto mb-12">
@@ -20,14 +20,16 @@ function Contactus() {
 
                 <div className="mt-12">
                     <img
-                        src="public/medical-clinics-mob.webp"
+                        src="/medical-clinics-mob.webp"
                         alt="Medical Facility"
-                        className="w-full h-96 object-cover rounded-lg"
+                        className="w-full max-h-[600px] object-contain rounded-2xl shadow-lg"
                     />
                 </div>
             </main>
+
             <Footer />
         </div>
     );
 }
-export default Contactus
+
+export default Contactus;
