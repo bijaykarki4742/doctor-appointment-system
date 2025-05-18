@@ -61,31 +61,36 @@ export function useForgotPassword({ onComplete }) {
     }
   }
 
-  const handleResetPassword = async (password) => {
-  setIsLoading(true)
-  setError("")
+  const handleResetPassword = async ({ newPassword, confirmPassword }) => {
+    setIsLoading(true);
+    setError("");
 
-  try {
-    const res = await fetch("http://localhost:3000/api/auth/reset-password", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ email, otp, password }),
-    })
+    try {
+      const res = await fetch("http://localhost:3000/api/auth/reset-password", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          email,
+          otp,
+          newPassword,
+          confirmPassword
+        }),
+      });
 
-    const data = await res.json()
+      const data = await res.json();
 
-    if (!res.ok) {
-      throw new Error(data.message || "Failed to reset password")
+      if (!res.ok) {
+        throw new Error(data.message || "Failed to reset password");
+      }
+
+      setStep(4);
+      if (onComplete) onComplete();
+    } catch (err) {
+      setError(err.message || "Unexpected error");
+    } finally {
+      setIsLoading(false);
     }
-
-    setStep(4)
-    if (onComplete) onComplete()
-  } catch (err) {
-    setError(err.message || "Unexpected error")
-  } finally {
-    setIsLoading(false)
-  }
-}
+  };
 
 
   return {
@@ -101,48 +106,48 @@ export function useForgotPassword({ onComplete }) {
   }
 }
 
-// ---------- MOCK BACKEND HANDLERS FOR DEMO PURPOSES ----------
+// // ---------- MOCK BACKEND HANDLERS FOR DEMO PURPOSES ----------
+//
+// // These would normally live in: /pages/api/forgot-password.js and /pages/api/reset-password.js
+//
+// export async function forgotPasswordApiHandler(req, res) {
+//   if (req.method !== "POST") {
+//     return res.status(405).json({ message: "Method Not Allowed" })
+//   }
+//
+//   const { email } = req.body
+//
+//   if (!email) {
+//     return res.status(400).json({ message: "Email is required" })
+//   }
+//
+//   try {
+//     console.log(`Sending OTP to ${email}`)
+//     return res.status(200).json({ message: "OTP sent successfully" })
+//   } catch (error) {
+//     return res.status(500).json({ message: "Failed to send OTP" })
+//   }
+// }
 
-// These would normally live in: /pages/api/forgot-password.js and /pages/api/reset-password.js
-
-export async function forgotPasswordApiHandler(req, res) {
-  if (req.method !== "POST") {
-    return res.status(405).json({ message: "Method Not Allowed" })
-  }
-
-  const { email } = req.body
-
-  if (!email) {
-    return res.status(400).json({ message: "Email is required" })
-  }
-
-  try {
-    console.log(`Sending OTP to ${email}`)
-    return res.status(200).json({ message: "OTP sent successfully" })
-  } catch (error) {
-    return res.status(500).json({ message: "Failed to send OTP" })
-  }
-}
-
-export async function resetPasswordApiHandler(req, res) {
-  if (req.method !== "POST") {
-    return res.status(405).json({ message: "Method Not Allowed" })
-  }
-
-  const { email, otp, password } = req.body
-
-  if (!email || !otp || !password) {
-    return res.status(400).json({ message: "Email, OTP, and password are required" })
-  }
-
-  try {
-    if (otp !== "123456") {
-      return res.status(400).json({ message: "Invalid or expired OTP" })
-    }
-
-    console.log(`Password reset for ${email}`)
-    return res.status(200).json({ message: "Password reset successfully" })
-  } catch (error) {
-    return res.status(500).json({ message: "Failed to reset password" })
-  }
-}
+// export async function resetPasswordApiHandler(req, res) {
+//   if (req.method !== "POST") {
+//     return res.status(405).json({ message: "Method Not Allowed" })
+//   }
+//
+//   const { email, otp, password } = req.body
+//
+//   if (!email || !otp || !password) {
+//     return res.status(400).json({ message: "Email, OTP, and password are required" })
+//   }
+//
+//   try {
+//     if (otp !== "123456") {
+//       return res.status(400).json({ message: "Invalid or expired OTP" })
+//     }
+//
+//     console.log(`Password reset for ${email}`)
+//     return res.status(200).json({ message: "Password reset successfully" })
+//   } catch (error) {
+//     return res.status(500).json({ message: "Failed to reset password" })
+//   }
+// }
