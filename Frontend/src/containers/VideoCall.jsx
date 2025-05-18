@@ -1,12 +1,13 @@
 import { useEffect, useRef, useState } from "react"
 import { io } from "socket.io-client"
-import { useParams } from "react-router-dom"
+import { useParams, useNavigate } from "react-router-dom"
 import { Mic, MicOff, Video, VideoOff, PhoneOff, User, Users } from "lucide-react"
 
 const SOCKET_SERVER_URL = "http://localhost:3000"
 
 const VideoCall = () => {
     const { roomId } = useParams()
+    const navigate = useNavigate()
     const ROOM_ID = roomId
 
     const localVideoRef = useRef(null)
@@ -20,6 +21,7 @@ const VideoCall = () => {
     const [isVideoOff, setIsVideoOff] = useState(false)
     const [callDuration, setCallDuration] = useState(0)
     const [callStatus, setCallStatus] = useState("Connecting...")
+    const [showEndCallDialog, setShowEndCallDialog] = useState(false)
 
     // Call duration timer
     useEffect(() => {
@@ -211,6 +213,7 @@ const VideoCall = () => {
             console.log("Disconnected from socket server")
             setCallStatus("Disconnected")
             setIsConnected(false)
+            handleCallEnd()
         })
 
         return () => {
@@ -240,6 +243,14 @@ const VideoCall = () => {
         }
     }
 
+    const handleCallEnd = () => {
+        setShowEndCallDialog(true)
+        // Redirect to home after 3 seconds
+        setTimeout(() => {
+            navigate("/")
+        }, 3000)
+    }
+
     const endCall = () => {
         if (socket) socket.disconnect()
         if (peerConnectionRef.current) peerConnectionRef.current.close()
@@ -248,6 +259,7 @@ const VideoCall = () => {
         }
         setIsConnected(false)
         setCallStatus("Call ended")
+        handleCallEnd()
     }
 
     return (
@@ -256,15 +268,14 @@ const VideoCall = () => {
             <div className="bg-teal-500 text-white p-4 shadow-md">
                 <div className="container mx-auto flex justify-between items-center">
                     <div className="flex items-center space-x-2">
-                        {/*<Users className="h-6 w-6" />*/}
                         <img src="../../public/EasyCare.png" className="w-8 h-8" />
                         <h1 className="text-xl font-semibold">Easy Care</h1>
                     </div>
                     <div className="flex items-center space-x-2">
                         <span className="text-sm font-medium bg-teal-600 px-3 py-1 rounded-full">Room: {ROOM_ID}</span>
                         <span className="text-sm font-medium bg-teal-600 px-3 py-1 rounded-full">
-              {formatDuration(callDuration)}
-            </span>
+                            {formatDuration(callDuration)}
+                        </span>
                     </div>
                 </div>
             </div>
@@ -359,6 +370,24 @@ const VideoCall = () => {
                     </button>
                 </div>
             </div>
+
+            {/* End Call Dialog */}
+            {showEndCallDialog && (
+                <div className="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center z-50">
+                    <div className="bg-white rounded-lg p-6 max-w-md w-full text-center">
+                        <div className="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-red-100 mb-4">
+                            <PhoneOff className="h-6 w-6 text-red-600" />
+                        </div>
+                        <h3 className="text-lg font-medium text-gray-900 mb-2">Appointment Ended</h3>
+                        <p className="text-gray-500 mb-4">
+                            The video call has been completed. You'll be redirected to the home page shortly.
+                        </p>
+                        <div className="flex justify-center">
+                            <div className="w-12 h-12 border-4 border-teal-500 border-t-transparent rounded-full animate-spin"></div>
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     )
 }
