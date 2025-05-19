@@ -8,11 +8,11 @@ import { Header } from "../containers/dashboard/header"
 
 export default function Dashboard() {
   // Mock data
-  const user = {
-    name: "Dr. John Smith",
-    specialty: "Cardiologist",
-    image: "/placeholder.svg?height=32&width=32",
-  }
+  // const user = {
+  //   name: "Dr. John Smith",
+  //   specialty: "Cardiologist",
+  //   image: "/placeholder.svg?height=32&width=32",
+  // }
 
   const stats = [
     {
@@ -59,18 +59,18 @@ export default function Dashboard() {
     },
   ]
 
-  const messages = [
-    {
-      sender: "Emma Davis",
-      senderImage: "/placeholder.svg?height=40&width=40",
-      content: "Thank you for the prescription...",
-    },
-    {
-      sender: "James Wilson",
-      senderImage: "/placeholder.svg?height=40&width=40",
-      content: "When should I come for...",
-    },
-  ]
+  // const messages = [
+  //   {
+  //     sender: "Emma Davis",
+  //     senderImage: "/placeholder.svg?height=40&width=40",
+  //     content: "Thank you for the prescription...",
+  //   },
+  //   {
+  //     sender: "James Wilson",
+  //     senderImage: "/placeholder.svg?height=40&width=40",
+  //     content: "When should I come for...",
+  //   },
+  // ]
 
   return (
         <div className="flex flex-col h-full bg-gray-50">
@@ -81,12 +81,12 @@ export default function Dashboard() {
               ))}
             </div>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              <div className="md:col-span-2">
+              <div className="md:col-span-3">
                 <AppointmentsTable appointments={appointments} />
               </div>
-              <div>
-                <RecentMessages messages={messages} />
-              </div>
+              {/*<div>*/}
+              {/*  <RecentMessages messages={messages} />*/}
+              {/*</div>*/}
             </div>
           </main>
         </div>

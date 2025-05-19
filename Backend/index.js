@@ -1,11 +1,14 @@
+// index.js
 import express from 'express';
 import { createServer } from 'http';
 import { fileURLToPath } from 'url';
 import path, { dirname, join } from 'path';
 import fs from 'fs';
 import cors from 'cors';
-import connectDB from './config/database.js';
+// import connectDB from './config/database.js';
 import router from './routes/indexRoute.js';
+import authRoutes from './routes/authRoutes.js';
+import connectDB from './config/database.js';
 import { setupSocket } from './Socket.js';
 
 const __filename = fileURLToPath(import.meta.url);
@@ -22,6 +25,7 @@ app.use(cors({
 app.use(express.json());
 
 // Routes
+app.use('/api/auth', authRoutes);
 app.use('/', router);
 app.use('/verification-images', express.static(path.join(__dirname, 'uploads/verifications')));
 
