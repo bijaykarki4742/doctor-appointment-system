@@ -24,10 +24,6 @@ export const createReview = async (req, res) => {
             return res.status(403).json({ success: false, message: 'Not authorized to review this appointment' });
         }
 
-        // if (appointment.status !== 'completed') {
-        //     return res.status(400).json({ success: false, message: 'Can only review completed appointments' });
-        // }
-
         const newReview = new Review({
             patientId,
             doctorId: appointment.doctorId,

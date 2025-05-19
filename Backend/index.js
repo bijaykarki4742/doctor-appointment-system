@@ -1,7 +1,7 @@
 import express from 'express';
 import { createServer } from 'http';
 import { fileURLToPath } from 'url';
-import { dirname, join } from 'path';
+import path, { dirname, join } from 'path';
 import fs from 'fs';
 import cors from 'cors';
 import connectDB from './config/database.js';
@@ -23,6 +23,7 @@ app.use(express.json());
 
 // Routes
 app.use('/', router);
+app.use('/verification-images', express.static(path.join(__dirname, 'uploads/verifications')));
 
 // Create HTTP server
 const httpServer = createServer(app);

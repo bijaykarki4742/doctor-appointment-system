@@ -31,10 +31,13 @@ export async function submitVerification(req, res) {
       return res.status(404).json({ error: 'Doctor not found' });
     }
 
+    //real path to the image url
+    const relativePath = `verifications/${req.file.filename}`;
+
     // Create verification record
     const verification = new verificationModel({
       doctorId,
-      imagePath: req.file.path,
+      imagePath: relativePath,
       status: 'pending'
     });
 
@@ -62,6 +65,51 @@ export async function submitVerification(req, res) {
       error: 'Server error during verification',
       details: process.env.NODE_ENV === 'development' ? error.message : undefined
     });
+  }
+}
+export async function setVerificationStatus(req, res) {
+  try {
+    const { doctorId } = req.params;
+    const { status } = req.body;
+
+    console.log('Setting verification status:', { doctorId, status });
+
+    // Validate status
+    if (!['approved', 'rejected'].includes(status)) {
+      return res.status(400).json({ error: 'Invalid status' });
+    }
+
+    // Find the verification record
+    const verification = await verificationModel.findOne({ doctorId }).sort({ createdAt: -1 });
+
+    if (!verification) {
+      return res.status(404).json({ error: 'Verification record not found' });
+    }
+
+    // Update the verification status
+    verification.status = status;
+    await verification.save();
+
+    // Update doctor's verification status
+    const doctor = await Doctor.findById(doctorId);
+    if (doctor) {
+      doctor.verificationStatus = status;
+      await doctor.save();
+    }
+
+    res.json({
+      message: 'Verification status updated successfully',
+      verification: {
+        id: verification._id,
+        doctorId: verification.doctorId,
+        status: verification.status,
+        imageUrl: `/verification-images/${verification.imagePath.split(/[\\/]/).pop()}` // Handles both / and \ in paths
+      }
+    });
+  }
+  catch (error) {
+    console.error('Error setting verification status:', error);
+    res.status(500).json({ error: 'Error setting verification status' });
   }
 }
 

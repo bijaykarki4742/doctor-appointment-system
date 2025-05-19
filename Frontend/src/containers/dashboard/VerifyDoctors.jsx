@@ -41,9 +41,11 @@ export default function VerifyDoctors() {
     };
 
     const getFullImageUrl = (imageUrl) => {
-        if (imageUrl && (imageUrl.startsWith('http://') || imageUrl.startsWith('https://'))) {
+        if (!imageUrl) return null;
+        if (imageUrl.startsWith('http://') || imageUrl.startsWith('https://')) {
             return imageUrl;
         }
+        return `http://localhost:3000${imageUrl}`; // concatinate with the base URL to solve the iamge accessing issue
     };
 
     const openImageModal = (imageUrl) => {
@@ -81,6 +83,7 @@ export default function VerifyDoctors() {
                             <TableHead>Actions</TableHead>
                         </TableRow>
                     </TableHeader>
+                    {/* table contents  */}
                     <TableBody>
                         {verifications.map((verification) => (
                             <TableRow key={verification._id || verification.id}>
@@ -126,7 +129,7 @@ export default function VerifyDoctors() {
                                     </Button>
                                     <Button
                                         size="sm"
-                                        variant="destructive"
+                                        className="bg-red-600 hover:bg-red-700 text-white shadow-sm focus-visible:ring-2 focus-visible:ring-red-500"
                                         onClick={() => handleVerification(verification._id || verification.id, 'rejected')}
                                     >
                                         <X className="mr-2 h-4 w-4" /> Reject
@@ -170,10 +173,9 @@ export default function VerifyDoctors() {
                                 <RotateCw className="h-4 w-4" />
                             </Button>
                             <Button
-                                variant="outline"
                                 size="icon"
                                 onClick={closeModal}
-                                className="bg-white hover:bg-gray-100"
+                                className="bg-red-600 hover:bg-red-700 text-white shadow-sm focus-visible:ring-2 focus-visible:ring-red-500"
                                 title="Close"
                             >
                                 <X className="h-4 w-4" />
