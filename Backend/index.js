@@ -28,7 +28,7 @@ app.use(express.json());
 app.use('/api/auth', authRoutes);
 app.use('/', router);
 app.use('/verification-images', express.static(path.join(__dirname, 'uploads/verifications')));
-
+app.use('/profile-pictures', express.static(path.join(__dirname, 'uploads/profile-pictures')));
 // Create HTTP server
 const httpServer = createServer(app);
 

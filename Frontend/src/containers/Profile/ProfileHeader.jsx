@@ -1,4 +1,4 @@
-import { useState } from "react"
+import { useState, useRef } from "react"
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
@@ -8,9 +8,11 @@ import VerificationDialog from "./VerificationDialog"
 import toast from "react-hot-toast"
 import api from "@/api/axios"
 
-export default function ProfileHeader({ data, userType, isEditing, toggleEditMode, doctorId }) {
+export default function ProfileHeader({ data, userType, isEditing, toggleEditMode, doctorId, onProfilePictureUpdate }) {
     const [imageHover, setImageHover] = useState(false);
     const [showVerificationDialog, setShowVerificationDialog] = useState(false);
+    const [isUploading, setIsUploading] = useState(false);
+    const fileInputRef = useRef(null);
 
     // Calculate age from date of birth
     const calculateAge = (dob) => {
@@ -23,9 +25,9 @@ export default function ProfileHeader({ data, userType, isEditing, toggleEditMod
         return `${data.firstName?.charAt(0) || ""}${data.lastName?.charAt(0) || ""}`;
     };
 
-    const token = localStorage.getItem("token")
-    const handleVerificationSubmit = async (imageFile) => {
+    const token = localStorage.getItem("token");
 
+    const handleVerificationSubmit = async (imageFile) => {
         try {
             const formData = new FormData();
             formData.append('verificationImage', imageFile);
@@ -47,6 +49,58 @@ export default function ProfileHeader({ data, userType, isEditing, toggleEditMod
         } catch (error) {
             console.error("Error submitting verification:", error);
             toast.error(error.message);
+        }
+    };
+
+    const handleCameraClick = () => {
+        fileInputRef.current.click();
+    };
+
+    const handleFileChange = async (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
+
+        // Validate file type and size
+        const validTypes = ['image/jpeg', 'image/png', 'image/gif'];
+        const maxSize = 5 * 1024 * 1024; // 5MB
+
+        if (!validTypes.includes(file.type)) {
+            toast.error('Please upload a valid image (JPEG, PNG, GIF)');
+            return;
+        }
+
+        if (file.size > maxSize) {
+            toast.error('Image size should be less than 5MB');
+            return;
+        }
+
+        setIsUploading(true);
+
+        try {
+            const formData = new FormData();
+            formData.append('profilePicture', file);
+
+            const response = await api.post(
+                '/uploads/profile-picture',
+                formData,
+                {
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                        'Content-Type': 'multipart/form-data'
+                    }
+                }
+            );
+
+            toast.success('Profile picture updated successfully!');
+            if (onProfilePictureUpdate) {
+                onProfilePictureUpdate(response.data.profilePictureUrl);
+            }
+        } catch (error) {
+            console.error('Error uploading profile picture:', error);
+            toast.error(error.response?.data?.message || 'Failed to upload profile picture');
+        } finally {
+            setIsUploading(false);
+            e.target.value = '';
         }
     };
 
@@ -80,11 +134,25 @@ export default function ProfileHeader({ data, userType, isEditing, toggleEditMod
                                 variant="secondary"
                                 size="icon"
                                 className="absolute -bottom-2 -right-2 h-8 w-8 rounded-full bg-teal-600 hover:bg-teal-700 text-white shadow-md transition-all"
+                                onClick={handleCameraClick}
+                                disabled={isUploading}
                             >
-                                <Camera className="h-4 w-4" />
+                                {isUploading ? (
+                                    <div className="animate-spin h-4 w-4 border-2 border-white border-t-transparent rounded-full"></div>
+                                ) : (
+                                    <Camera className="h-4 w-4" />
+                                )}
                             </Button>
+                            <input
+                                type="file"
+                                ref={fileInputRef}
+                                onChange={handleFileChange}
+                                accept="image/*"
+                                className="hidden"
+                            />
                         </div>
 
+                        {/* Rest of your component remains the same */}
                         {/* User info section - centered and stacked */}
                         <div className="w-full mt-4 text-center">
                             <h2 className="text-2xl font-bold text-gray-800">
@@ -124,7 +192,7 @@ export default function ProfileHeader({ data, userType, isEditing, toggleEditMod
 
                             {/* Action buttons */}
                             <div className="flex flex-wrap justify-center gap-3 mt-5">
-                                {!isEditing && (
+                                {!isEditing && userType === "doctor" && ( 
                                     <Button
                                         variant="outline"
                                         size="sm"

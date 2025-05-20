@@ -148,7 +148,7 @@ export default function MedicalInformation({ data, isEditing, handleChange, hand
 
     return (
         <Card className="bg-white shadow-lg rounded-lg overflow-hidden mb-8">
-            <CardHeader className="bg-blue-500 text-white p-4">
+            <CardHeader className="bg-teal-500 text-white p-4">
                 <CardTitle className="text-2xl font-bold">Medical Information</CardTitle>
             </CardHeader>
             <CardContent className="p-6 space-y-6">
@@ -282,7 +282,7 @@ export default function MedicalInformation({ data, isEditing, handleChange, hand
                                     />
                                 </div>
                                 <Button
-                                    className="mt-2 bg-blue-500 text-white hover:bg-blue-600"
+                                    className="mt-2 bg-teal-500 text-white hover:bg-teal-600"
                                     onClick={addMedicalCondition}
                                     disabled={!newCondition.condition.trim()}
                                 >
