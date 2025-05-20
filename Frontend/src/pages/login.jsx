@@ -8,6 +8,7 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Label } from "@/components/ui/label"
 import { AlertCircle, Mail, Lock, ArrowRight } from "lucide-react"
 import { Alert, AlertDescription } from "@/components/ui/alert"
+import { Link } from "react-router-dom";
 // import Link from "next/link"
 import api from "../api/axios"
 import { useAuth } from "@/Contexts/AuthContext"
@@ -168,18 +169,19 @@ const Login = () => {
                     <span className="flex items-center justify-center">
                       Sign in <ArrowRight className="ml-2 h-4 w-4" />
                     </span>
+                    
                   )}
                 </Button>
               </form>
             </CardContent>
-            {/* <CardFooter className="flex justify-center border-t pt-6">
+            { <CardFooter className="flex justify-center border-t pt-6">
               <p className="text-sm text-gray-600">
                 Don't have an account?{" "}
-                <Link href="/signup" className="text-teal-600 hover:text-teal-700 font-medium hover:underline">
-                  Create account
+                <Link to="/signup" className="text-teal-600 hover:text-teal-700 font-medium hover:underline">
+                  Signup
                 </Link>
               </p>
-            </CardFooter> */}
+            </CardFooter> }
           </Card>
         </div>
       </div>

@@ -10,6 +10,7 @@ import { Checkbox } from "@/components/ui/checkbox"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Textarea } from "@/components/ui/textarea"
+import { Link } from "react-router-dom"
 import {
   AlertCircle,
   CheckCircle2,
@@ -262,9 +263,9 @@ const Signup = () => {
               </div>
               <div className="hidden md:flex items-center space-x-2 text-sm text-gray-500">
                 <span>Already have an account?</span>
-                {/* <Link href="/login" className="text-teal-600 font-medium hover:underline">
-                  Sign in
-                </Link> */}
+                 <Link to="/login" className="text-teal-600 font-medium hover:underline">
+                  Login
+                </Link> 
               </div>
             </div>
           </div>
@@ -391,6 +392,7 @@ const Signup = () => {
                       <div className="space-y-2">
                         <Label htmlFor="firstName" className="text-sm font-medium">
                           First Name
+                          <span className="text-red-500">*</span>
                         </Label>
                         <Input
                           {...register("firstName", {
@@ -410,6 +412,7 @@ const Signup = () => {
                       <div className="space-y-2">
                         <Label htmlFor="lastName" className="text-sm font-medium">
                           Last Name
+                          <span className="text-red-500">*</span>
                         </Label>
                         <Input
                           {...register("lastName", {
@@ -430,6 +433,7 @@ const Signup = () => {
                     <div className="space-y-2">
                       <Label htmlFor="email" className="text-sm font-medium">
                         Email Address
+                        <span className="text-red-500">*</span>
                       </Label>
                       <div className="relative">
                         <Input
@@ -452,6 +456,7 @@ const Signup = () => {
                     <div className="space-y-2">
                       <Label htmlFor="contact" className="text-sm font-medium">
                         Contact Number
+                        <span className="text-red-500">*</span>
                       </Label>
                       <div className="relative">
                         <Input
@@ -642,6 +647,7 @@ const Signup = () => {
                       <div className="space-y-2">
                         <Label htmlFor="dateOfBirth" className="text-sm font-medium">
                           Date of Birth
+                          <span className="text-red-500">*</span>
                         </Label>
                         <Input
                           {...register("dateOfBirth", {
@@ -659,6 +665,7 @@ const Signup = () => {
                       <div className="space-y-2">
                         <Label htmlFor="gender" className="text-sm font-medium">
                           Gender
+                          <span className="text-red-500">*</span>
                         </Label>
                         <Select
                           onValueChange={(value) => setValue("gender", value)}
@@ -683,7 +690,8 @@ const Signup = () => {
                     </div>
 
                     <div className="space-y-2">
-                      <Label className="text-sm font-medium">Address</Label>
+                      <Label className="text-sm font-medium">Address<span className="text-red-500">*</span></Label>
+                      
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div className="space-y-2">
                           <Input
@@ -838,7 +846,8 @@ const Signup = () => {
                 {step === 3 && role === "patient" && (
                   <div className="space-y-6 animate-fadeIn">
                     <div className="space-y-2">
-                      <Label className="text-sm font-medium">Insurance Information</Label>
+                      <Label className="text-sm font-medium">Insurance Information<span className="text-red-500">*</span></Label>
+
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <Input
                           {...register("insuranceInfo.provider")}
@@ -878,7 +887,10 @@ const Signup = () => {
                     </div>
 
                     <div className="space-y-2">
-                      <Label className="text-sm font-medium">Emergency Contact</Label>
+                      <Label className="text-sm font-medium">Emergency Contact<Label className="text-sm font-medium">
+                      <span className="text-red-500">*</span>
+</Label>
+</Label>
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <Input
                           {...register("emergencyContact.name")}
