@@ -1,47 +1,46 @@
-"use client"
-
-import { useEffect, useState } from "react"
-import { Button } from "@/components/ui/button"
-import { useToast, toast} from "@/components/ui/use-toast.js"
-import api from "@/api/axios.js"
-import ProfileHeader from "@/containers/Profile/ProfileHeader"
-import PersonalInformation from "@/containers/Profile/PersonalInformation"
-import ProfessionalInformation from "@/containers/Profile/ProfessionalInformation"
-import MedicalInformation from "@/containers/Profile/MedicalInformation"
-import UpcomingAppointment from "@/containers/Profile/UpcomingAppointment"
-import { Settings } from "lucide-react"
+import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom"; // Import useNavigate for navigation
+import { Button } from "@/components/ui/button";
+import { useToast } from "@/components/ui/use-toast";
+import api from "@/api/axios.js";
+import ProfileHeader from "@/containers/Profile/ProfileHeader";
+import PersonalInformation from "@/containers/Profile/PersonalInformation";
+import ProfessionalInformation from "@/containers/Profile/ProfessionalInformation";
+import MedicalInformation from "@/containers/Profile/MedicalInformation";
+import { Settings, ArrowLeft } from "lucide-react";
 
 export default function ProfileSettings() {
-    const [userType, setUserType] = useState(null)
-    const [isEditing, setIsEditing] = useState(false)
-    const [data, setData] = useState(null)
-    const [profileId, setProfileId] = useState(null)
-    const [date, setDate] = useState()
-    const [loading, setLoading] = useState(true)
-    const [saving, setSaving] = useState(false)
-    const [error, setError] = useState("")
-    const { toast } = useToast()
+    const navigate = useNavigate(); // Initialize navigate
+    const [userType, setUserType] = useState(null);
+    const [isEditing, setIsEditing] = useState(false);
+    const [data, setData] = useState(null);
+    const [profileId, setProfileId] = useState(null);
+    const [date, setDate] = useState();
+    const [loading, setLoading] = useState(true);
+    const [saving, setSaving] = useState(false);
+    const [error, setError] = useState("");
+    const { toast } = useToast();
 
     useEffect(() => {
-        fetchUserData()
-    }, [])
+        fetchUserData();
+    }, []);
 
     const fetchUserData = async () => {
         try {
-            setLoading(true)
-            const token = localStorage.getItem("token")
-            if (!token) throw new Error("No authentication token found")
+            setLoading(true);
+            const token = localStorage.getItem("token");
+            if (!token) throw new Error("No authentication token found");
 
             const response = await api.get(`/users/me`, {
                 headers: { Authorization: `Bearer ${token}` },
-            })
+            });
             console.log(response);
 
-            const userRole = response.data.user?.role
-            const profileData = response.data.profile
+            const userRole = response.data.user?.role;
+            const profileData = response.data.profile;
 
-            setProfileId(profileData._id)
-            console.log(profileId)
+            setProfileId(profileData._id);
+            console.log(profileId);
             if (userRole === "patient") {
                 setData({
                     firstName: profileData.firstName || "",
@@ -55,8 +54,8 @@ export default function ProfileSettings() {
                     medicalHistory: profileData.medicalHistory || [],
                     allergies: profileData.allergies || [],
                     emergencyContact: profileData.emergencyContact || {},
-                    profilePicture: profileData.profilePicture || "/placeholder.svg?height=200&width=200"
-                })
+                    profilePicture: profileData.profilePicture || "/placeholder.svg?height=200&width=200",
+                });
             } else if (userRole === "doctor") {
                 setData({
                     firstName: profileData.firstName || "",
@@ -73,24 +72,24 @@ export default function ProfileSettings() {
                     languagesSpoken: profileData.languagesSpoken || [],
                     consultationFee: profileData.consultationFee || 0,
                     profilePicture: profileData.profilePicture || "/placeholder.svg?height=200&width=200",
-                    isVerified: profileData.isVerified || false
-                })
+                    isVerified: profileData.isVerified || false,
+                });
             }
 
-            setUserType(userRole)
-            setError("")
+            setUserType(userRole);
+            setError("");
         } catch (error) {
-            console.error("Failed to fetch profile", error)
-            setError(error.message || "Failed to fetch profile")
+            console.error("Failed to fetch profile", error);
+            setError(error.message || "Failed to fetch profile");
             toast({
                 title: "Error",
                 description: "Failed to load profile data. Please try again.",
                 variant: "destructive",
-            })
+            });
         } finally {
-            setLoading(false)
+            setLoading(false);
         }
-    }
+    };
 
     const handleSave = () => {
         if (userType === "doctor" || userType === "patient") {
@@ -101,24 +100,24 @@ export default function ProfileSettings() {
                 setSaving,
                 setIsEditing,
                 fetchUserData,
-                toast
-            })
+                toast,
+            });
         } else {
-            console.log("Saving patient data:", data)
-            setIsEditing(false)
+            console.log("Saving patient data:", data);
+            setIsEditing(false);
         }
-    }
+    };
 
     const updateUserProfile = async ({ role, profileId, data, setSaving, setIsEditing, fetchUserData, toast }) => {
         try {
-            setSaving(true)
+            setSaving(true);
 
-            const token = localStorage.getItem("token")
-            if (!token) throw new Error("No authentication token found")
-            if (!profileId) throw new Error("Profile ID not found. Please refresh the page.")
+            const token = localStorage.getItem("token");
+            if (!token) throw new Error("No authentication token found");
+            if (!profileId) throw new Error("Profile ID not found. Please refresh the page.");
 
-            let updateData = {}
-            let endpoint = ""
+            let updateData = {};
+            let endpoint = "";
 
             if (role === "doctor") {
                 updateData = {
@@ -134,8 +133,8 @@ export default function ProfileSettings() {
                     bio: data.bio,
                     languagesSpoken: data.languagesSpoken,
                     consultationFee: Number(data.consultationFee),
-                }
-                endpoint = `/doctors/update/${profileId}`
+                };
+                endpoint = `/doctors/update/${profileId}`;
             } else if (role === "patient") {
                 updateData = {
                     firstName: data.firstName,
@@ -150,55 +149,54 @@ export default function ProfileSettings() {
                     allergies: data.allergies,
                     emergencyContact: data.emergencyContact,
                     profilePicture: data.profilePicture,
-                }
-                endpoint = `/users/update/${profileId}`
+                };
+                endpoint = `/users/update/${profileId}`;
             } else {
-                throw new Error("Invalid role")
+                throw new Error("Invalid role");
             }
 
             const response = await api.patch(endpoint, updateData, {
                 headers: { Authorization: `Bearer ${token}` },
-            })
+            });
 
-            const success = response.data.doctor || response.data.profile || response.data.patient
+            const success = response.data.doctor || response.data.profile || response.data.patient;
             if (success) {
                 toast({
                     title: "Success",
                     description: "Profile updated successfully",
-                })
-                console.log("Saving this data:", data)
-                await fetchUserData()
+                });
+                console.log("Saving this data:", data);
+                await fetchUserData();
             } else {
-                throw new Error(response.data.message || "Failed to update profile")
+                throw new Error(response.data.message || "Failed to update profile");
             }
         } catch (err) {
             toast({
                 title: "Error",
                 description: err.message || "Failed to update profile. Please try again.",
                 variant: "destructive",
-            })
+            });
         } finally {
-            setSaving(false)
-            setIsEditing(false)
+            setSaving(false);
+            setIsEditing(false);
         }
-    }
-
+    };
 
     const handleChange = (e) => {
-        const { name, value } = e.target
-        setData({ ...data, [name]: value })
-    }
+        const { name, value } = e.target;
+        setData({ ...data, [name]: value });
+    };
 
     const handleSelectChange = (name, value) => {
-        setData({ ...data, [name]: value })
-    }
+        setData({ ...data, [name]: value });
+    };
 
     const handleDateChange = (newDate) => {
-        setDate(newDate)
+        setDate(newDate);
         if (userType === "patient" && newDate) {
-            setData({ ...data, dateOfBirth: newDate })
+            setData({ ...data, dateOfBirth: newDate });
         }
-    }
+    };
 
     if (loading) {
         return (
@@ -210,7 +208,7 @@ export default function ProfileSettings() {
                     </div>
                 </div>
             </div>
-        )
+        );
     }
 
     if (error || !data || !userType) {
@@ -222,19 +220,34 @@ export default function ProfileSettings() {
                     <Button onClick={fetchUserData}>Try Again</Button>
                 </div>
             </div>
-        )
+        );
     }
 
     return (
         <div className="container mx-auto py-6 max-w-4xl">
             <div className="flex items-center justify-between mb-6">
-                <h1 className="text-2xl font-bold">Profile Settings</h1>
+                <div className="flex items-center gap-4">
+                    <Button
+                        variant="ghost"
+                        size="icon"
+                        onClick={() => navigate("/")} // Navigate to home page
+                        aria-label="Go to home page"
+                    >
+                        <ArrowLeft className="h-5 w-5" />
+                    </Button>
+                    <h1 className="text-2xl font-bold">Profile Settings</h1>
+                </div>
                 <Button variant="ghost" size="icon">
                     <Settings className="h-5 w-5" />
                 </Button>
             </div>
 
-            <ProfileHeader data={data} userType={userType} isEditing={isEditing} toggleEditMode={() => setIsEditing(!isEditing)} />
+            <ProfileHeader
+                data={data}
+                userType={userType}
+                isEditing={isEditing}
+                toggleEditMode={() => setIsEditing(!isEditing)}
+            />
 
             <PersonalInformation
                 data={data}
@@ -267,8 +280,6 @@ export default function ProfileSettings() {
                     setIsEditing={setIsEditing}
                 />
             )}
-
-            {/*{userType === "patient" && <UpcomingAppointment />}*/}
         </div>
-    )
+    );
 }

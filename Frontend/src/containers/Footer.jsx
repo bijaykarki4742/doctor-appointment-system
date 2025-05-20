@@ -1,7 +1,6 @@
 import { Phone, Mail } from "lucide-react";
 import { Link } from "react-router-dom";
 
-
 export default function Footer() {
     return (
         <footer className="bg-slate-900 text-slate-200 py-12">
@@ -23,7 +22,7 @@ export default function Footer() {
                                 </Link>
                             </li>
                             <li>
-                                <Link to="/contact" className="text-slate-300 hover:text-white transition-colors">
+                                <Link to="/contactUs" className="text-slate-300 hover:text-white transition-colors">
                                     Contact
                                 </Link>
                             </li>
