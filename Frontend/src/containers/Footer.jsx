@@ -22,7 +22,7 @@ export default function Footer() {
                                 </Link>
                             </li>
                             <li>
-                                <Link to="/contact" className="text-slate-300 hover:text-white transition-colors">
+                                <Link to="/contactUs" className="text-slate-300 hover:text-white transition-colors">
                                     Contact
                                 </Link>
                             </li>

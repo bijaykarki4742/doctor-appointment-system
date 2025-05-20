@@ -10,16 +10,19 @@ import { Settings } from "lucide-react"
 import toast from "react-hot-toast"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { set } from "date-fns"
+import { useNavigate } from "react-router-dom";
 
 export default function ProfileSettings() {
-    const [userType, setUserType] = useState(null)
-    const [isEditing, setIsEditing] = useState(false)
-    const [data, setData] = useState(null)
-    const [profileId, setProfileId] = useState(null)
-    const [date, setDate] = useState()
-    const [loading, setLoading] = useState(true)
-    const [saving, setSaving] = useState(false)
-    const [error, setError] = useState("")
+    const navigate = useNavigate(); // Initialize navigate
+    const [userType, setUserType] = useState(null);
+    const [isEditing, setIsEditing] = useState(false);
+    const [data, setData] = useState(null);
+    const [profileId, setProfileId] = useState(null);
+    const [date, setDate] = useState();
+    const [loading, setLoading] = useState(true);
+    const [saving, setSaving] = useState(false);
+    const [error, setError] = useState("");
+    const { toast } = useToast();
     const [doctorId, setDoctorId] = useState(null)
 
     useEffect(() => {
@@ -111,12 +114,8 @@ export default function ProfileSettings() {
             setSaving(true)
 
             const token = localStorage.getItem("token")
-            if (!token) {
-                toast.error("No authentication,Please login to access this page")
-            }
-            if (!profileId) {
-                toast.error("Profile ID not found. Please refresh the page.")
-            }
+            if (!token) throw new Error("No authentication token found")
+            if (!profileId) throw new Error("Profile ID not found. Please refresh the page.")
 
             let updateData = {}
             let endpoint = ""
@@ -222,11 +221,22 @@ export default function ProfileSettings() {
             </div>
         )
     }
+
     return (
-        <div className="container m-auto p-6 ">
-            <div className="flex justify-between items-center mb-4">
-                <h1 className="text-2xl font-bold text-gray-900">Profile Settings</h1>
-                <Button variant="ghost" size="icon" className="text-gray-500 hover:text-gray-700">
+        <div className="container mx-auto py-6 max-w-4xl">
+            <div className="flex items-center justify-between mb-6">
+                <div className="flex items-center gap-4">
+                    <Button
+                        variant="ghost"
+                        size="icon"
+                        onClick={() => navigate("/")} // Navigate to home page
+                        aria-label="Go to home page"
+                    >
+                        <ArrowLeft className="h-5 w-5" />
+                    </Button>
+                    <h1 className="text-2xl font-bold">Profile Settings</h1>
+                </div>
+                <Button variant="ghost" size="icon">
                     <Settings className="h-5 w-5" />
                 </Button>
             </div>

@@ -16,6 +16,7 @@ import { DashboardLayout } from "@/pages/DashboardLayout.jsx"
 import VideoCall from "@/containers/VideoCall.jsx";
 import { UserProvider } from "@/Contexts/UserContext.jsx";
 import ProtectedRoute from "@/containers/ProtectedRoute.jsx";
+import FAQ from "@/pages/FAQ.jsx";
 import DoctorsPage from "@/containers/dashboard/doctors.jsx";
 import DoctorAppointmentStats from "@/containers/dashboard/barChart.jsx";
 import { Toaster } from "react-hot-toast"
@@ -66,6 +67,7 @@ function App() {
                     <Route path="/bookDoctor" element={<BookDoctor />} />
                     <Route path="/dashboard" element={<Dashboard />} />
                     <Route path="/videoCall/:roomId" element={<VideoCall />} />
+                    <Route path="/faq" element={<FAQ />} />
 
                     {/* Dashboard Layout nested routes */}
                     <Route path="/admin" element={<DashboardLayout />}>
