@@ -26,11 +26,11 @@ export function AppSidebar({ ...props }) {
     ...(role === "admin"
       ? [
         { icon: Users, label: "Patients", path: "/admin/patients" },
+        { icon: Users, label: "Patients", path: "/admin/doctors" },
         { icon: Check, label: "Verify Doctors", path: "/admin/verifyDoctors" },
       ]
       : []),
     { icon: BarChart3, label: "Profile", path: "/Userprofile" },
-    { icon: Settings, label: "Settings", path: "/settings" },
   ];
 
   if (loading) return null; // or show a loader while fetching role

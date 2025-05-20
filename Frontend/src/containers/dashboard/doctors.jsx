@@ -111,9 +111,6 @@ export default function DoctorsPage() {
         <div className="container mx-auto py-6 px-4">
             <div className="flex justify-between items-center mb-6">
                 <h1 className="text-2xl font-bold text-gray-800">Manage Doctors</h1>
-                <Button className="bg-blue-600 hover:bg-blue-700">
-                    <span className="mr-2">+</span> Add New Doctor
-                </Button>
             </div>
 
             <div className="flex flex-col md:flex-row justify-between gap-4 mb-6">

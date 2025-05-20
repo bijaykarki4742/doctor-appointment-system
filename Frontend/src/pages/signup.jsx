@@ -1,5 +1,3 @@
-"use client"
-
 import { useState, useEffect } from "react"
 import { useForm } from "react-hook-form"
 import { Input } from "@/components/ui/input"
@@ -22,7 +20,7 @@ import {
   FileText,
 } from "lucide-react"
 import { Alert, AlertDescription } from "@/components/ui/alert"
-// import Link from "next/link"
+import {Link} from "react-router-dom";
 import api from "../api/axios"
 
 const Signup = () => {
@@ -262,9 +260,9 @@ const Signup = () => {
               </div>
               <div className="hidden md:flex items-center space-x-2 text-sm text-gray-500">
                 <span>Already have an account?</span>
-                {/* <Link href="/login" className="text-teal-600 font-medium hover:underline">
+                <Link to="/login" className="text-teal-600 font-medium hover:underline">
                   Sign in
-                </Link> */}
+                </Link>
               </div>
             </div>
           </div>
@@ -814,14 +812,7 @@ const Signup = () => {
                           I agree to the Terms & Conditions
                         </label>
                         <p className="text-sm text-muted-foreground">
-                          By creating an account, you agree to our{" "}
-                          {/* <Link href="#" className="text-teal-600 hover:underline">
-                            Terms of Service
-                          </Link>{" "}
-                          and{" "}
-                          <Link href="#" className="text-teal-600 hover:underline">
-                            Privacy Policy
-                          </Link> */}
+                          By creating an account, you agree to our terms and conditions
                           .
                         </p>
                       </div>
@@ -915,14 +906,7 @@ const Signup = () => {
                           I agree to the Terms & Conditions
                         </label>
                         <p className="text-sm text-muted-foreground">
-                          By creating an account, you agree to our{" "}
-                          {/* <Link href="#" className="text-teal-600 hover:underline">
-                            Terms of Service
-                          </Link>{" "}
-                          and{" "}
-                          <Link href="#" className="text-teal-600 hover:underline">
-                            Privacy Policy
-                          </Link> */}
+                          By creating an account, you agree to our terms and conditions
                           .
                         </p>
                       </div>

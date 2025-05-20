@@ -105,9 +105,6 @@ export default function PatientsPage() {
         <div className="container mx-auto py-6 px-4">
             <div className="flex justify-between items-center mb-6">
                 <h1 className="text-2xl font-bold text-gray-800">Manage Patients</h1>
-                <Button className="bg-blue-600 hover:bg-blue-700">
-                    <span className="mr-2">+</span> Add New Patient
-                </Button>
             </div>
 
             <div className="flex flex-col md:flex-row justify-between gap-4 mb-6">
@@ -226,7 +223,6 @@ export default function PatientsPage() {
                     </div>
 
                     {/* View Patient Dialog */}
-                    // Update the View Patient Dialog section in your PatientsPage component
                     <Dialog open={isViewDialogOpen} onOpenChange={setIsViewDialogOpen}>
                         {selectedPatient && (
                             <DialogContent>

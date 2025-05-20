@@ -111,8 +111,8 @@ export function Appointment({ doctor }) {
                     end: timeSlot.end
                 },
                 reason: formData.reason,
-                paymentStatus: "paid", // Add payment status
-                paymentMethod: "esewa" // Add payment method
+                // paymentStatus: "paid", // Add payment status
+                // paymentMethod: "esewa" // Add payment method
             };
 
             const response = await api.post("/appointments/", appointmentData, {

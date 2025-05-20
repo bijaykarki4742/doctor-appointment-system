@@ -1,19 +1,16 @@
-import { useEffect, useState } from "react"
-import { Button } from "@/components/ui/button"
-import api from "@/api/axios.js"
-import ProfileHeader from "@/containers/Profile/ProfileHeader"
-import PersonalInformation from "@/containers/Profile/PersonalInformation"
-import ProfessionalInformation from "@/containers/Profile/ProfessionalInformation"
-import MedicalInformation from "@/containers/Profile/MedicalInformation"
-import UpcomingAppointment from "@/containers/Profile/UpcomingAppointment"
-import { Settings } from "lucide-react"
-import toast from "react-hot-toast"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { set } from "date-fns"
+import { useEffect, useState } from "react";
+import { Button } from "@/components/ui/button";
+import api from "@/api/axios.js";
+import ProfileHeader from "@/containers/Profile/ProfileHeader";
+import PersonalInformation from "@/containers/Profile/PersonalInformation";
+import ProfessionalInformation from "@/containers/Profile/ProfessionalInformation";
+import MedicalInformation from "@/containers/Profile/MedicalInformation";
+import { Settings, ArrowLeft } from "lucide-react";
+import toast from "react-hot-toast";
 import { useNavigate } from "react-router-dom";
 
 export default function ProfileSettings() {
-    const navigate = useNavigate(); // Initialize navigate
+    const navigate = useNavigate();
     const [userType, setUserType] = useState(null);
     const [isEditing, setIsEditing] = useState(false);
     const [data, setData] = useState(null);
@@ -22,30 +19,28 @@ export default function ProfileSettings() {
     const [loading, setLoading] = useState(true);
     const [saving, setSaving] = useState(false);
     const [error, setError] = useState("");
-    const { toast } = useToast();
-    const [doctorId, setDoctorId] = useState(null)
+    const [doctorId, setDoctorId] = useState(null);
 
     useEffect(() => {
-        fetchUserData()
-    }, [])
+        fetchUserData();
+    }, []);
 
     const fetchUserData = async () => {
         try {
-            setLoading(true)
-            const token = localStorage.getItem("token")
-            if (!token) throw new Error("No authentication token found")
+            setLoading(true);
+            const token = localStorage.getItem("token");
+            if (!token) throw new Error("No authentication token found");
 
             const response = await api.get(`/users/me`, {
                 headers: { Authorization: `Bearer ${token}` },
-            })
-            // console.log(response);
+            });
 
-            const userRole = response.data.user?.role
-            const profileData = response.data.profile
-            setDoctorId(response.data.user?._id)
+            const userRole = response.data.user?.role;
+            const profileData = response.data.profile;
+            setDoctorId(response.data.user?._id);
 
-            setProfileId(profileData._id)
-            // console.log(profileId)
+            setProfileId(profileData._id);
+
             if (userRole === "patient") {
                 setData({
                     firstName: profileData.firstName || "",
@@ -59,8 +54,8 @@ export default function ProfileSettings() {
                     medicalHistory: profileData.medicalHistory || [],
                     allergies: profileData.allergies || [],
                     emergencyContact: profileData.emergencyContact || {},
-                    profilePicture: profileData.profilePicture || "/placeholder.svg?height=200&width=200"
-                })
+                    profilePicture: profileData.profilePicture || "/placeholder.svg?height=200&width=200",
+                });
             } else if (userRole === "doctor") {
                 setData({
                     firstName: profileData.firstName || "",
@@ -77,20 +72,19 @@ export default function ProfileSettings() {
                     languagesSpoken: profileData.languagesSpoken || [],
                     consultationFee: profileData.consultationFee || 0,
                     profilePicture: profileData.profilePicture || "/placeholder.svg?height=200&width=200",
-                    isVerified: profileData.isVerified || false
-                })
+                    isVerified: profileData.isVerified || false,
+                });
             }
 
-            setUserType(userRole)
-            setError("")
+            setUserType(userRole);
+            setError("");
         } catch (error) {
-            console.error("Failed to fetch profile", error)
-            // setError(error.message || "Failed to fetch profile")
-            toast.error("Failed to load profile data. Please try again.")
+            console.error("Failed to fetch profile", error);
+            toast.error("Failed to load profile data. Please try again.");
         } finally {
-            setLoading(false)
+            setLoading(false);
         }
-    }
+    };
 
     const handleSave = () => {
         if (userType === "doctor" || userType === "patient") {
@@ -101,24 +95,30 @@ export default function ProfileSettings() {
                 setSaving,
                 setIsEditing,
                 fetchUserData,
-                toast
-            })
+            });
         } else {
-            console.log("Saving patient data:", data)
-            setIsEditing(false)
+            console.log("Saving patient data:", data);
+            setIsEditing(false);
         }
-    }
+    };
 
-    const updateUserProfile = async ({ role, profileId, data, setSaving, setIsEditing, fetchUserData, toast }) => {
+    const updateUserProfile = async ({
+                                         role,
+                                         profileId,
+                                         data,
+                                         setSaving,
+                                         setIsEditing,
+                                         fetchUserData,
+                                     }) => {
         try {
-            setSaving(true)
+            setSaving(true);
 
-            const token = localStorage.getItem("token")
-            if (!token) throw new Error("No authentication token found")
-            if (!profileId) throw new Error("Profile ID not found. Please refresh the page.")
+            const token = localStorage.getItem("token");
+            if (!token) throw new Error("No authentication token found");
+            if (!profileId) throw new Error("Profile ID not found. Please refresh the page.");
 
-            let updateData = {}
-            let endpoint = ""
+            let updateData = {};
+            let endpoint = "";
 
             if (role === "doctor") {
                 updateData = {
@@ -134,8 +134,8 @@ export default function ProfileSettings() {
                     bio: data.bio,
                     languagesSpoken: data.languagesSpoken,
                     consultationFee: Number(data.consultationFee),
-                }
-                endpoint = `/doctors/update/${profileId}`
+                };
+                endpoint = `/doctors/update/${profileId}`;
             } else if (role === "patient") {
                 updateData = {
                     firstName: data.firstName,
@@ -150,52 +150,47 @@ export default function ProfileSettings() {
                     allergies: data.allergies,
                     emergencyContact: data.emergencyContact,
                     profilePicture: data.profilePicture,
-                }
-                endpoint = `/users/update/${profileId}`
+                };
+                endpoint = `/users/update/${profileId}`;
             } else {
-                toast.error(" Invalid role ID.")
-                throw new Error("Invalid role")
+                toast.error("Invalid role ID.");
+                throw new Error("Invalid role");
             }
 
             const response = await api.patch(endpoint, updateData, {
                 headers: { Authorization: `Bearer ${token}` },
-            })
+            });
 
-            const success = response.data.doctor || response.data.profile || response.data.patient
+            const success = response.data.doctor || response.data.profile || response.data.patient;
             if (success) {
-                toast.success("Profile updated successfully")
-                console.log("Saving this data:", data)
-                await fetchUserData()
+                toast.success("Profile updated successfully");
+                await fetchUserData();
             } else {
-                throw new Error(response.data.message || "Failed to update profile")
+                throw new Error(response.data.message || "Failed to update profile");
             }
         } catch (err) {
-            toast({
-                title: "Error",
-                description: err.message || "Failed to update profile. Please try again.",
-                variant: "destructive",
-            })
+            toast.error(err.message || "Failed to update profile. Please try again.");
         } finally {
-            setSaving(false)
-            setIsEditing(false)
+            setSaving(false);
+            setIsEditing(false);
         }
-    }
+    };
 
     const handleChange = (e) => {
-        const { name, value } = e.target
-        setData({ ...data, [name]: value })
-    }
+        const { name, value } = e.target;
+        setData({ ...data, [name]: value });
+    };
 
     const handleSelectChange = (name, value) => {
-        setData({ ...data, [name]: value })
-    }
+        setData({ ...data, [name]: value });
+    };
 
     const handleDateChange = (newDate) => {
-        setDate(newDate)
+        setDate(newDate);
         if (userType === "patient" && newDate) {
-            setData({ ...data, dateOfBirth: newDate })
+            setData({ ...data, dateOfBirth: newDate });
         }
-    }
+    };
 
     if (loading) {
         return (
@@ -207,7 +202,7 @@ export default function ProfileSettings() {
                     </div>
                 </div>
             </div>
-        )
+        );
     }
 
     if (error || !data || !userType) {
@@ -219,17 +214,17 @@ export default function ProfileSettings() {
                     <Button onClick={fetchUserData}>Try Again</Button>
                 </div>
             </div>
-        )
+        );
     }
 
     return (
-        <div className="container mx-auto py-6 max-w-4xl">
+        <div className="container p-5">
             <div className="flex items-center justify-between mb-6">
                 <div className="flex items-center gap-4">
                     <Button
                         variant="ghost"
                         size="icon"
-                        onClick={() => navigate("/")} // Navigate to home page
+                        onClick={() => navigate("/admin/dashboard")}
                         aria-label="Go to home page"
                     >
                         <ArrowLeft className="h-5 w-5" />
@@ -241,9 +236,7 @@ export default function ProfileSettings() {
                 </Button>
             </div>
 
-            {/* Main Content Area */}
             <div className="flex flex-col lg:flex-row gap-8">
-                {/* Left Column - Profile Card  */}
                 <div className="lg:w-1/4">
                     <ProfileHeader
                         data={data}
@@ -254,9 +247,7 @@ export default function ProfileSettings() {
                     />
                 </div>
 
-                {/* Right Column - Forms  */}
                 <div className="lg:w-3/4 h-[calc(100vh-180px)] lg:h-[calc(100vh-180px)] overflow-y-auto pr-2">
-                    {/* Personal Information */}
                     <PersonalInformation
                         data={data}
                         userType={userType}
@@ -268,7 +259,6 @@ export default function ProfileSettings() {
                         setData={setData}
                     />
 
-                    {/* Professional/Medical Information */}
                     {userType === "doctor" ? (
                         <ProfessionalInformation
                             data={data}
@@ -292,5 +282,5 @@ export default function ProfileSettings() {
                 </div>
             </div>
         </div>
-    )
+    );
 }

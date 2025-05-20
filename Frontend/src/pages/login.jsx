@@ -12,7 +12,7 @@ import api from "../api/axios"
 import { useAuth } from "@/Contexts/AuthContext"
 import ForgotPasswordDialog from "@/containers/ForgotPassword/forgot-password-dialog"
 import { useUserRole } from "@/Contexts/UserContext.jsx";
-
+import {Link} from "react-router-dom"
 const Login = () => {
   // Setup react-hook-form
   const {
@@ -50,8 +50,9 @@ const Login = () => {
           name: response.data.user.name,
           email: response.data.user.email,
         })
-        if (role === 'patient') navigate("/")
-        else if (role === 'admin' || role === 'doctor') navigate("/admin/dashboard");
+        const userRole = response.data.user.role;
+        if (userRole === 'patient') navigate("/")
+        else if (userRole === 'admin' || userRole === 'doctor') navigate("/admin/dashboard");
 
       } else {
         throw new Error(response.data.error || "Login failed")
@@ -205,14 +206,14 @@ const Login = () => {
                 </Button>
               </form>
             </CardContent>
-            {/* <CardFooter className="flex justify-center border-t pt-6">
+            <CardFooter className="flex justify-center border-t pt-6">
               <p className="text-sm text-gray-600">
                 Don't have an account?{" "}
-                <Link href="/signup" className="text-teal-600 hover:text-teal-700 font-medium hover:underline">
+                <Link to="/signup" className="text-teal-600 hover:text-teal-700 font-medium hover:underline">
                   Create account
                 </Link>
               </p>
-            </CardFooter> */}
+            </CardFooter>
           </Card>
           <ForgotPasswordDialog open={forgotPasswordOpen} onOpenChange={setForgotPasswordOpen} />
         </div>
