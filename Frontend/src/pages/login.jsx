@@ -50,8 +50,10 @@ const Login = () => {
           name: response.data.user.name,
           email: response.data.user.email,
         })
-        if (role === 'patient') navigate("/")
-        else if (role === 'admin' || role === 'doctor') navigate("/admin/dashboard");
+
+        const userRole = response.data.user.role;
+        if (userRole === 'patient') navigate("/")
+        else if (userRole === 'admin' || userRole === 'doctor') navigate("/admin/dashboard");
 
       } else {
         throw new Error(response.data.error || "Login failed")
