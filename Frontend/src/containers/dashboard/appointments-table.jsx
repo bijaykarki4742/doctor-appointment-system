@@ -92,6 +92,9 @@ export function AppointmentsTable() {
                 }
 
                 const transformedData = filteredAppointments.map((appointment) => {
+
+                    // console.log("Appointment Data:", appointment);
+                    
                     const appointmentDate = new Date(appointment.date);
                     const formattedDate = appointmentDate.toLocaleDateString();
                     const time = `${appointment.timeSlot.start} - ${appointment.timeSlot.end}`;
@@ -122,8 +125,8 @@ export function AppointmentsTable() {
                     return {
                         id: appointment._id,
                         patientId: appointment.patientId,
-                        patientName: `${appointment.patientId.firstName} ${appointment.patientId.lastName}`,
-                        doctorName: `${appointment.doctorId.firstName} ${appointment.doctorId.lastName}`,
+                        patientName: `${appointment.patientId?.firstName} ${appointment.patientId?.lastName}`,
+                        doctorName: `${appointment.doctorId?.firstName} ${appointment.doctorId?.lastName}`,
                         date: formattedDate,
                         time: time,
                         reason: appointment.reason,
